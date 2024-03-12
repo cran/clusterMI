@@ -1,0 +1,33 @@
+citHeader("To cite clusterMI in publications use:")
+
+bibentry(
+  bibtype = "Article",
+  title        = "Clustering with missing data: which equivalent for Rubin's rules?",
+  author       = c(person("Vincent","Audigier"),
+                   person("Ndeye", "Niang")),
+  year	       = 2022,
+  journal      = "Advances in Data Analysis and Classification",
+  doi          = "10.1007/s11634-022-00519-1",
+  url          = "https://hal.science/hal-03766733",
+
+  textVersion  =
+  paste("Vincent Audigier, Ndeye Niang (2022).",
+        "Clustering with missing data: which equivalent for Rubin's rules?",
+        "Advances in Data Analysis and Classification.",
+        "URL https://hal.science/hal-03766733")
+)
+
+bibentry(
+  bibtype = "misc",
+  title = "Clustering with missing data: which imputation model for which cluster analysis method?", 
+  author = c(person("Vincent","Audigier"),
+                   person("Ndeye", "Niang"),
+                   person("Matthieu","Resche-Rigon")),
+  year = "2021",
+  eprint = "2106.04424",
+  archivePrefix = "arXiv",
+  textVersion  =
+  paste("Vincent Audigier, Ndeye Niang  and Matthieu Resche-Rigon (2021).",
+        "Clustering with missing data: which imputation model for which cluster analysis method?",
+        "arXiv e-prints")
+)

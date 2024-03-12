@@ -1,0 +1,28 @@
+#' Chemical analysis of wines from three different cultivars
+#'
+#' Data are the results of a chemical analysis of
+#' wines grown in the same region in Italy but derived from three
+#' different cultivars. The analysis determined the quantities of 13 constituents
+#' found in each of the three types of wines
+#'
+#' @usage data(wine)
+#' @format A data frame with 178 rows and 14 variables:
+#' \describe{
+#'   \item{cult}{Cultivar}
+#'   \item{alco}{Alcohol}
+#'   \item{malic}{Malic acid}
+#'   \item{ash}{Ash}
+#'   \item{alca}{Alcalinity of ash}
+#'   \item{mg}{Magnesium}
+#'   \item{phe}{Total phenols}
+#'   \item{fla}{Flavanoids}
+#'   \item{nfla}{Nonflavanoid phenols}
+#'   \item{pro}{Proanthocyanins}
+#'   \item{col}{Color intensity}
+#'   \item{hue}{Hue}
+#'   \item{ratio}{OD280/OD315 of diluted wines}
+#'   \item{prol}{Proline}
+#' }
+#' @source \url{https://archive.ics.uci.edu/ml/datasets/wine}
+#' @references M. Forina, C. Armanino, M. Castino and M. Ubigli. Vitis, 25:189-201 (1986)
+"wine"
