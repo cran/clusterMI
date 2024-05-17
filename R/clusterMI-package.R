@@ -14,7 +14,7 @@
 #' @importFrom stats coef kmeans lm na.omit step
 #' @description
 #' \code{clusterMI} is a R package to perform clustering with missing values. For achieving this goal, multiple imputation is used.
-#' The package offers various multiple imputation methods dedicated to clustered individuals, as discussed in  Audigier et al. (2021) <arXiv:2106.04424>.
+#' The package offers various multiple imputation methods dedicated to clustered individuals, as discussed in Audigier et al. (2021) <arXiv:2106.04424>.
 #' In addition, it allows pooling results both in terms of partition and instability, as proposed in Audigier and Niang (2022) <doi:10.1007/s11634-022-00519-1>. Among applications, this instability measure can be used to choose a number of clusters with missing values.
 #' @name clusterMI-package
 #' @examples

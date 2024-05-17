@@ -42,17 +42,25 @@
 #' \donttest{
 #' nnodes <- 2 # Number of CPU cores used for parallel computation
 #' 
-#' # Multiple imputation (with m = 100, but use m>200 in practice) 
+#' # Multiple imputation
 #' 
 #' res.imp.over <- imputedata(data.na = wine.na,
 #'                            nb.clust = nb.clust,
-#'                            m = 100)
+#'                            m = 200)
 #' # Overimputation
-#'                             
+#' 
+#' ## overimputed variable
+#' plotvars <- "alco" 
+#' 
+#' ## selection of 20 complete individuals on variable "alco"
+#' plotinds <- sample(which(!is.na(wine.na[, plotvars])),
+#'                     size = 20)
+#' ## overimputation                   
 #' res.over <- overimpute(res.imp.over,
 #'                        nnodes = nnodes,
-#'                        plotvars = 1,
-#'                        plotinds = sample(seq(nrow(wine.na)), size = 30))
+#'                        plotvars = plotvars,
+#'                        plotinds = plotinds,
+#'                        )
 #' }
 
 overimpute <- function (res.imputedata, plotvars = NULL, plotinds = NULL, nnodes = 2, 
@@ -156,24 +164,26 @@ overimpute <- function (res.imputedata, plotvars = NULL, plotinds = NULL, nnodes
   }else{
     Mfrow<-mfrow
   }
+  pct <- round(100*mean(((res.over[, "trueval"] <= res.over[, 
+                                                        "bsup"]) & (res.over[, "trueval"] >= res.over[, "binf"]))), 
+               2)
   par(mfrow = Mfrow, mar = mar)
-  by(res.over, INDICES = res.over$var, FUN = function(xx) {
-    plot(x = xx[, "trueval"], y = xx[, "xbar"], 
-         col = as.character(xx[, "col"]), xlab = "observed values", 
-         ylab = "imputed values", main = xx[1, "var"], 
+  by(res.over, INDICES = res.over$var, FUN = function(xx, 
+                                                      pct) {
+    plot(x = xx[, "trueval"], y = xx[, "xbar"], col = as.character(xx[, 
+                                                                      "col"]), xlab = "observed values", ylab = "imputed values", 
+         main = paste(xx[1, "var"], " (cov =", pct,"%)"), 
          ylim = c(min(xx[, "binf"], na.rm = T), max(xx[, 
                                                        "bsup"], na.rm = T)))
     abline(0, 1)
     segments(x0 = xx[, "trueval"], x1 = xx[, "trueval"], 
-             y0 = xx[, "binf"], y1 = xx[, "bsup"], 
-             col = as.character(xx[, "col"]))
+             y0 = xx[, "binf"], y1 = xx[, "bsup"], col = as.character(xx[, 
+                                                                         "col"]))
     legend("bottomright", legend = c("0-0.2", "0.2-0.4", 
-                                     "0.4-0.6", "0.6-0.8", "0.8-1"), 
-           col = c("blue", "green", heat.colors(3)[c(3, 
-                                                     2, 1)]),
-           bty = "n", lty = 1, horiz =TRUE, 
-           cex = 1, lwd = 0.4)
-  })
+                                     "0.4-0.6", "0.6-0.8", "0.8-1"), col = c("blue", 
+                                                                             "green", heat.colors(3)[c(3, 2, 1)]), bty = "n", 
+           lty = 1, horiz = TRUE, cex = 1, lwd = 0.4)
+  }, pct = pct)
   # par(xpd=TRUE)
   # plot(1, type = "n", axes=FALSE, xlab="", ylab="")
   # legend("top", inset=0, legend=names(pch), pch=pch,bg=bg[1],bty = "n",cex=1.1,horiz=TRUE) 

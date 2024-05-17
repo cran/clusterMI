@@ -145,7 +145,19 @@ clusterMI<-function(output,
   }else if(output$call$data.type=="mixed"){
     warning("Data are mixed, cluster analysis is performed on principal components")
     if(scaling){warning("scaling = TRUE does not make sense with mixed data")}
-    res.imp.intern<-lapply(res.imp,FUN=function(xx){as.data.frame(FAMD(xx,ncp=Inf,graph=FALSE)$ind$coord)})
+    
+    res.imp.intern<-lapply(res.imp,FUN=function(xx){
+      if(all(sapply(xx,is.factor)|sapply(xx,is.ordered))){
+        # il ne reste que des quali après suppression des variables incomplètes
+        res.out <- as.data.frame(MCA(xx,ncp=Inf,graph=FALSE)$ind$coord)
+      } else if(all(sapply(xx,is.numeric)|sapply(xx,is.integer))){
+        # il ne reste que des quanti après suppression des variables incomplètes
+        res.out <- as.data.frame(PCA(xx,ncp=Inf,graph=FALSE)$ind$coord)
+          }else{
+      res.out <- as.data.frame(FAMD(xx,ncp=Inf,graph=FALSE)$ind$coord)
+          }
+      return(res.out)
+      })
     scaling.intern<-FALSE
   }else if(output$call$data.type=="continuous"){
     res.imp.intern<-res.imp
@@ -223,7 +235,7 @@ clusterMI<-function(output,
   }
   
   if(method.clustering=="mixture"){
-      if(verbose){pb <- utils::txtProgressBar(style = 3)}else{pb<-NULL}
+      if(verbose){cat("\n");pb <- utils::txtProgressBar(style = 3)}else{pb<-NULL}
       res.clust <- mapply(res.imp.intern, seq(length(res.imp.intern)), 
                           FUN = function(xx, indice, scaling, nb.clust, 
                                          modelNames, modelName, pb, indicemax, seed=NULL) {
@@ -343,7 +355,17 @@ clusterMI<-function(output,
                             nb.clust=nb.clust.intern,
                             Cboot=Cboot,
                             method.agnes=method.agnes,
-                            modelNames=modelNames,nstart.kmeans=nstart.kmeans,nnodes=nnodes,instability=instability,m.cmeans=m.cmeans))
+                            modelNames=modelNames,
+                            nstart.kmeans=nstart.kmeans,
+                            nnodes=nnodes,
+                            instability=instability,
+                            m.cmeans=m.cmeans,
+                            nmf.threshold= nmf.threshold,
+                            nmf.nstart=nmf.nstart,
+                            nmf.early_stop_iter=nmf.early_stop_iter,
+                            nmf.initializer = nmf.initializer,
+                            nmf.batch_size = nmf.batch_size,
+                            nmf.iter.max=nmf.iter.max,res.analyse = res.clust.part.list))
   }else{
     res.out<-list(part=res.pool,
                   instability=list(Ubar=NA,U=NA,B=NA),
@@ -354,7 +376,14 @@ clusterMI<-function(output,
                             nb.clust=nb.clust,
                             Cboot=Cboot,
                             method.agnes=method.agnes,
-                            modelNames=modelNames,nstart.kmeans=nstart.kmeans,nnodes=nnodes,instability=instability,m.cmeans=m.cmeans))
+                            modelNames=modelNames,nstart.kmeans=nstart.kmeans,nnodes=nnodes,instability=instability,
+                            m.cmeans=m.cmeans,
+                            nmf.threshold= nmf.threshold,
+                            nmf.nstart=nmf.nstart,
+                            nmf.early_stop_iter=nmf.early_stop_iter,
+                            nmf.initializer = nmf.initializer,
+                            nmf.batch_size = nmf.batch_size,
+                            nmf.iter.max=nmf.iter.max,res.analyse = res.clust.part.list))
   }
   return(res.out)
 }

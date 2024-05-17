@@ -17,6 +17,7 @@
 #'   \item{rand}{a \code{m}-1 vector given the rand index between the \code{m} successive consensus partitions}
 #' @param output an output from the clusterMI function
 #' @param graph a boolean indicating if a graphic is plotted
+#' @param nnodes number of CPU cores for parallel computing. By default \code{nnodes = 1}.
 #' @export
 #' @seealso \code{\link{clusterMI}}, \code{\link{imputedata}}
 #' @references
@@ -37,18 +38,49 @@
 #' res.imp <- imputedata(data.na = wine.na, nb.clust = nb.clust, m = m)
 #' 
 #' #pooling
-#' res.pool <- clusterMI(res.imp, instability = FALSE)
+#' nnodes <- 2 # number of CPU cores for parallel computing
+#' res.pool <- clusterMI(res.imp, instability = FALSE, nnodes = nnodes)
 #' 
 #' res.choosem <- choosem(res.pool)
 
-choosem<-function(output,graph=TRUE){
-  
-  part<-sapply(seq(1,output$call$output$call$m,1),FUN=function(m,output){
-  output.intern<-output$call$output
-  output.intern$res.imp<-output.intern$res.imp[seq(m)]
-  res.out<-clusterMI(output.intern,instability=FALSE,verbose = FALSE)$part
-  return(res.out)
-  },output=output)
+choosem <- function(output,graph=TRUE,nnodes = 1){
+  if(is.null(nnodes)){
+    nnodes.intern <- output$call$nnodes
+  }else{
+    nnodes.intern <- nnodes
+  }
+  if(nnodes.intern>1){
+    cl <- parallel::makeCluster(nnodes.intern, type = "PSOCK")
+    parallel::clusterExport(cl, list("output","fastnmf"), envir = environment())
+    part <- parallel::parSapply(cl, seq(1,output$call$output$call$m,1),
+                                FUN = function(m,output){
+                                  
+                                  res.out<-fastnmf(output$call$res.analyse[seq.int(m)],
+                                                   nb.clust =output$call$output$call$nb.clust,
+                                                   threshold = output$call$nmf.threshold,nstart = output$call$nmf.nstart,
+                                                   early_stop_iter = output$call$nmf.early_stop_iter,
+                                                   initializer = output$call$nmf.initializer,
+                                                   batch_size = output$call$nmf.batch_size,
+                                                   iter.max = output$call$nmf.iter.max,
+                                                   printflag = FALSE)$clust
+                                  
+                                  return(res.out)
+                                },output=output)
+    parallel::stopCluster(cl)
+    
+  }else{
+    
+    part<-sapply(seq(1,output$call$output$call$m,1),FUN=function(m,output){
+      res.out<-fastnmf(output$call$res.analyse[seq.int(m)],
+                       nb.clust =output$call$output$call$nb.clust,
+                       threshold = output$call$nmf.threshold,nstart = output$call$nmf.nstart,
+                       early_stop_iter = output$call$nmf.early_stop_iter,
+                       initializer = output$call$nmf.initializer,
+                       batch_size = output$call$nmf.batch_size,iter.max = output$call$nmf.iter.max,printflag = FALSE)$clust
+      
+      return(res.out)
+    },output=output)
+  }
   colnames(part)<-seq(1,output$call$output$call$m,1)
   res.out<-rep(NA,ncol(part)-1)
   for(ii in 1:(ncol(part)-1)){

@@ -9,9 +9,24 @@ drawW<-function(res.mclust,method="QDA"){
   }else{res.mclust.tmp<-res.mclust}
   nb.clust<-res.mclust.tmp$G
   n<-length(res.mclust.tmp$classification)
-  mu<-lapply(as.data.frame(res.mclust.tmp$parameters$mean),I)
+ 
   theta<-as.list(res.mclust.tmp$parameters$pro)
-  Sigma<-list();for(ii in seq(nb.clust)){Sigma[[ii]]<-res.mclust.tmp$parameters$variance$sigma[,,ii]}
+  Sigma<-list()
+  if (nchar(res.mclust$modelName) == 3) {
+    mu <- lapply(as.data.frame(res.mclust.tmp$parameters$mean), 
+                 I)
+    for (ii in seq(nb.clust)) {
+      Sigma[[ii]] <- res.mclust.tmp$parameters$variance$sigma[, 
+                                                              , ii]
+    }
+  }
+  else if (nchar(res.mclust$modelName) == 1) {
+    mu <- res.mclust.tmp$parameters$mean
+    for (ii in seq(nb.clust)) {
+      Sigma[[ii]] <- as.matrix(res.mclust.tmp$parameters$variance$sigma)
+    }
+  }
+
   Z<-res.mclust.tmp$data
   if(method=="QDA"){
     proba<- mapply(FUN = function(mu,theta,Sigma,Z){

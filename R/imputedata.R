@@ -21,7 +21,7 @@
 #' @param maxit number of iterations for FCS methods (only used for method = FCS-homo or method = FCS-hetero)
 #' @param Lstart number of iterations for the burn-in period (only used if method ="JM-DP" or "JM-GL")
 #' @param L number of skipped iterations to keep one imputed data set after the burn-in period (only used if method ="JM-DP" or "JM-GL")
-#' @param method.mice a vector of strings (or a single string) giving the imputation method for each variable (only used for method = FCS-homo or method = FCS-hetero). Default value is "norm" for FCS-homo and "mice.impute.2l.jomo" for FCS-hetero
+#' @param method.mice a vector of strings (or a single string) giving the imputation method for each variable (only used for method = FCS-homo or method = FCS-hetero). Default value is "pmm" (predictive mean matching) for FCS-homo and "mice.impute.2l.jomo" for FCS-hetero
 #' @param predictmat predictor matrix used for FCS imputation (only used for method = FCS-homo or method = FCS-hetero)
 #' @param verbose a boolean. If TRUE, a message is printed at each iteration. Use verbose = FALSE for silent imputation
 #' @param seed a positive integer initializing the random generator
@@ -49,7 +49,7 @@
 #' wine.na <- as.matrix(wine.na)
 #' wine.na[sample(seq(length(wine.na)), size = ceiling(length(wine.na)/3))] <- NA
 #' nb.clust <- 3 # number of clusters
-#' m <- 3 # number of imputed data sets
+#' m <- 20 # number of imputed data sets
 #' res.imp <- imputedata(data.na = wine.na, nb.clust = nb.clust, m = m)
 #' lapply(res.imp$res.imp, summary)
 
@@ -66,12 +66,20 @@ imputedata<-function(data.na,method="JM-GL",
       data.type<-"mixed"
     }
   }
+  # check number of categories for each categorical variable
+  if(data.type != "continuous"){
+    tmp<-(sapply(data.na[sapply(data.na,is.factor)],nlevels)==1)
+    if(any(tmp)){warning(cat("At least one factor has only one level and cannot be considered for clustering. Variable(s)",names(which(tmp)),"should be removed.\n"))}
+  }
+  
   #check colnames (mice ne supporte pas n'importe quel nom)
   checkcolnames<-try(sapply(colnames(data.na),str2lang),silent=TRUE)
   if(("try-error"%in%class(checkcolnames))&method%in%c("FCS-homo","FCS-hetero")){
     stop("Colnames of data.na are not supported by mice. Please rename colnames with character string compatible with str2lang")
   }
   
+  #check colnames for predicmat
+  if(!is.null(predictmat)){if(!(identical(colnames(predictmat),colnames(data.na)))){stop("The column names for predictmat and data.na do not match")}}
   Call<-list(data.na=data.na,method=method,
   nb.clust=nb.clust,m=m,maxit=maxit,Lstart=Lstart,L=L,method.mice=method.mice,
   predictmat=predictmat,data.type=data.type,bootstrap=bootstrap)
@@ -90,7 +98,7 @@ imputedata<-function(data.na,method="JM-GL",
       prior.dir<-try(myem.mix(dataset = data.na,
                           K = nb.clust,silent = TRUE)$theta$pi,silent=TRUE)#ML
       quali.index<-NULL
-      res.conv<-array(NA,dim=c(m,maxit,ncol(data.na),2),dimnames=list(seq(m),seq(maxit),colnames(data.na),c("var_inter","var_intra")))
+      res.conv<-array(NA,dim=c(m,maxit,ncol(data.na),2),dimnames=list(seq.int(m),seq.int(maxit),colnames(data.na),c("var_inter","var_intra")))
       
     }else if(data.type=="categorical"){
       data.na.schaf<-sapply(data.na,as.numeric)
@@ -105,13 +113,13 @@ imputedata<-function(data.na,method="JM-GL",
       data.na.schaf<-data.na.schaf[,c(quali.index,quanti.index)]
       prior.dir<-0.5;class(prior.dir)<-"try-error"
       res.conv<-array(NA,dim=c(m,maxit,ncol(data.na)-length(quali.index),2),
-                      dimnames=list(seq(m),seq(maxit),colnames(data.na)[quanti.index],c("var_inter","var_intra")))
+                      dimnames=list(seq.int(m),seq.int(maxit),colnames(data.na)[quanti.index],c("var_inter","var_intra")))
       
     }
     if("try-error"%in%class(prior.dir)){prior.dir<-0.5#;rngseed(seed)
     }
     res.imp<-list()
-    for (tab in seq(m)) {
+    for (tab in seq.int(m)) {
       seed.tmp <- NULL
       if (tab == 1) {
         seed.tmp <- seed
@@ -162,7 +170,7 @@ imputedata<-function(data.na,method="JM-GL",
         data.init <- as.data.frame(data.na)
         data.init <- complete(mice(data = data.init, 
                                    maxit = 0))
-        clustering.tmp <- sample(seq(nb.clust), size = nrow(data.na), 
+        clustering.tmp <- sample(seq.int(nb.clust), size = nrow(data.na), 
                                  replace = TRUE)
         data.init.tmp <- cbind.data.frame(class = as.factor(clustering.tmp), 
                                           data.init)
@@ -174,7 +182,7 @@ imputedata<-function(data.na,method="JM-GL",
       
       don.na.class<-cbind.data.frame(class=as.factor(clustering.tmp),data.na)
       if(verbose){cat(" nbiter = ")}
-      for(nbiter in seq(maxit)){
+      for(nbiter in seq.int(maxit)){
         if(verbose){cat(nbiter,"...",sep="")}
         #besoin de mettre a jour le clustering a part, car completement manquant
         if(is.null(predictmat)){
@@ -224,19 +232,29 @@ imputedata<-function(data.na,method="JM-GL",
                                                    graph=FALSE,ncp=Inf)$ind$coord)
           
         }else if(data.type=="mixed"){
+          if(length(intersect(names(quali.index),varnotimputed))==length(quali.index)){
+            #il n'y a alors plus de variables quali
+            data.init.tmp.intern<-cbind.data.frame(class=data.init.tmp[,which(colnames(data.init.tmp)=="class")],
+                                                     data.init.tmp[,-which(colnames(data.init.tmp)%in%c("class",varnotimputed))])
+            
+            }else{
           data.init.tmp.intern<-cbind.data.frame(class=data.init.tmp[,which(colnames(data.init.tmp)=="class")],
                                                  FAMD(
                                                    data.init.tmp[,-which(colnames(data.init.tmp)%in%c("class",varnotimputed))],
                                                    graph=FALSE,ncp=Inf)$ind$coord)
-          
+          }
         }
         if(!bootstrap){
         # tirage de W
-
-        res.myem<-myem.mix(dataset = data.init.tmp.intern[,-which(colnames(data.init.tmp.intern)=="class")],
-                           K = nb.clust,silent = TRUE)
-        res.myimp<-myimp.mix(data.init.tmp.intern[,-which(colnames(data.init.tmp.intern)=="class")],
-                             K = nb.clust,seed = NULL,silent = TRUE)
+          res.myem <- myem.mix(dataset = data.init.tmp.intern[, 
+                                                                  -which(colnames(data.init.tmp.intern) == 
+                                                                           "class"),drop = FALSE],
+                                   K = nb.clust,
+                                   silent = TRUE)
+          res.myimp <- myimp.mix(data.init.tmp.intern[, 
+                                                      -which(colnames(data.init.tmp.intern) == 
+                                                               "class"), drop=FALSE], K = nb.clust, seed = NULL, 
+                                 silent = TRUE)
         W<-res.myimp[,"class"]
         # tirage de theta
         res.myem.new<-res.myem
@@ -250,15 +268,21 @@ imputedata<-function(data.na,method="JM-GL",
         W<-imp.mix(res.myem.new$s,theta = res.myem.new$theta)[,"class"]
         
         }else{
-          res.mclust<-mclustboot.intern(data.init.tmp.intern[,-which(colnames(data.init.tmp.intern)=="class")],
-                                        G=nb.clust,modelNames = "EEE",verbose =FALSE)
-          res.mclust$data<-as.matrix(data.init.tmp.intern[,-which(colnames(data.init.tmp.intern)=="class")])
+          if(ncol(data.init.tmp.intern[,-which(colnames(data.init.tmp.intern)=="class"),drop=FALSE])==1){
+            #une seule variable pour le clustering
+            modelNames.tmp<-"E"
+          }else{
+            modelNames.tmp<- "EEE"
+              }
+          res.mclust<-mclustboot.intern(data.init.tmp.intern[,-which(colnames(data.init.tmp.intern)=="class"),drop=FALSE],
+                                        G=nb.clust,modelNames = modelNames.tmp, verbose =FALSE)
+          res.mclust$data<-as.matrix(data.init.tmp.intern[,-which(colnames(data.init.tmp.intern)=="class"),drop=FALSE])
           
           W<-drawW(res.mclust = res.mclust,method = "LDA")
           #gestion du cas ou une classe est vide
           if(length(unique(W))<nb.clust){
             tableW<-rep(0,nb.clust)
-            names(tableW)<-as.character(seq(nb.clust))
+            names(tableW)<-as.character(seq.int(nb.clust))
             tableW[as.character(unique(W))]<-table(W)
           }else{
             tableW<-table(W)
@@ -304,10 +328,10 @@ imputedata<-function(data.na,method="JM-GL",
        prior.dir<-try(myem.mix(dataset = data.na,
                         K = nb.clust,silent = TRUE)$theta$pi,silent=TRUE)
     if("try-error"%in%class(prior.dir)){prior.dir<-0.5}
-    res.conv<-array(NA,dim=c(m,maxit,ncol(data.na),2),dimnames=list(seq(m),seq(maxit),colnames(data.na),c("var_inter","var_intra")))
+    res.conv<-array(NA,dim=c(m,maxit,ncol(data.na),2),dimnames=list(seq.int(m),seq.int(maxit),colnames(data.na),c("var_inter","var_intra")))
     res.imp<-list()
     # if(checkconv){par(mfrow=c(m,1))}
-    for(tab in seq(m)){
+    for(tab in seq.int(m)){
       if(verbose){cat("\n m =",tab)}
       if(tab==1){data.init<-try(as.data.frame(myimp.mix(data.na,K = nb.clust,silent = TRUE, seed = seed)),silent=TRUE)
       }else{
@@ -316,7 +340,7 @@ imputedata<-function(data.na,method="JM-GL",
       if("try-error"%in%class(data.init)){
         cat("random initialization\n")
         data.init<-as.data.frame(data.na)
-        data.init<-cbind.data.frame(class=as.factor(sample(seq(nb.clust),size=nrow(data.na),replace=TRUE)),complete(mice(data = data.init,maxit=0)))
+        data.init<-cbind.data.frame(class=as.factor(sample(seq.int(nb.clust),size=nrow(data.na),replace=TRUE)),complete(mice(data = data.init,maxit=0)))
       }
       clustering.tmp<-as.integer(data.init$class)
       data.init.tmp<-cbind.data.frame(class=clustering.tmp,data.init[,-which(colnames(data.init)=="class")])
@@ -341,7 +365,7 @@ imputedata<-function(data.na,method="JM-GL",
       }
       method.mice.tmp<-rep(method.mice.hetero,ncol(data.init));names(method.mice.tmp)<-colnames(data.init);method.mice.tmp[method=="class"]<-""
       if(verbose){cat(" nbiter = ")}
-      for(nbiter in seq(maxit)){
+      for(nbiter in seq.int(maxit)){
         if(verbose){cat(nbiter,"...",sep="")}
         #besoin de mettre a jour le clustering ? part, car completement manquant
         data.init.tmp<-complete(mice(data = don.na.class,
@@ -388,7 +412,7 @@ imputedata<-function(data.na,method="JM-GL",
         #gestion du cas ou une classe est vide
         if(length(unique(Wstar))<nb.clust){
           tableWstar<-rep(0,nb.clust)
-          names(tableWstar)<-as.character(seq(nb.clust))
+          names(tableWstar)<-as.character(seq.int(nb.clust))
           tableWstar[as.character(unique(Wstar))]<-table(Wstar)
         }else{
           tableWstar<-table(Wstar)
@@ -448,7 +472,7 @@ imputedata<-function(data.na,method="JM-GL",
         
         newtheta<-try(da.mix(res.myem$s,res.myem$theta,steps=ceiling(Lstart),prior=res.myem$theta$pi), silent = TRUE)
         if("try-error"%in%class(newtheta)){newtheta<-try(da.mix(res.myem$s,res.myem$theta,steps=ceiling(Lstart)),silent = TRUE)}
-        for(tab in seq(m)){
+        for(tab in seq.int(m)){
           if(verbose){cat(tab,"...",sep="")}
           res.try<-try(da.mix(res.myem$s,newtheta,steps=L,prior=res.myem$theta$pi),silent = TRUE)
           if("try-error"%in%class(res.try)){
@@ -473,7 +497,7 @@ imputedata<-function(data.na,method="JM-GL",
                          K = nb.clust,
                          silent = TRUE)
       newtheta<-try(da.cat(res.myem$s,res.myem$theta,steps=Lstart,showits = (verbose==2)),silent=TRUE)
-      for(tab in seq(m)){
+      for(tab in seq.int(m)){
         if(verbose){cat(tab,"...",sep="")}
         newtheta<-try(da.cat(res.myem$s,newtheta,steps=ceiling(L),showits = (verbose==2)),silent=TRUE)
 
@@ -497,7 +521,7 @@ imputedata<-function(data.na,method="JM-GL",
     model_obj <- createModel(data_obj, K_mix_comp = nb.clust)
     result_obj <- multipleImp(model_obj = model_obj, data_obj=data_obj,n_burnin = Lstart, m_Imp =m, interval_btw_Imp = L)
     res.imp<-list()
-    for(tab in seq(m)){
+    for(tab in seq.int(m)){
       # if(verbose){cat(tab,"...",sep="")}
       res.imp[[tab]]<-as.data.frame(result_obj$multiple_Imp[tab,,])
       colnames(res.imp[[tab]])<-colnames(data.na)

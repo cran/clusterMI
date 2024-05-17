@@ -130,7 +130,7 @@ for (varindex in listvar.intern){
                                             Y = Y[ind.full,drop=FALSE],
                                             B=B,sizeblock = sizeblock,methods=method.select,
                                             path.outfile=path.outfile,nb.clust = nb.clust.intern,
-                                            printflag=FALSE,r=r.intern[varindex],modelNames=modelNames
+                                            printflag=!is.null(path.outfile),r=r.intern[varindex],modelNames=modelNames
   )
   tmp.bar<-res.varsel[[varindex]]$res$proportion
   names(tmp.bar)<-names(oldname)[-which(names(oldname)==varindex)]

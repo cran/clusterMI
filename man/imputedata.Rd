@@ -34,7 +34,7 @@ imputedata(
 
 \item{L}{number of skipped iterations to keep one imputed data set after the burn-in period (only used if method ="JM-DP" or "JM-GL")}
 
-\item{method.mice}{a vector of strings (or a single string) giving the imputation method for each variable (only used for method = FCS-homo or method = FCS-hetero). Default value is "norm" for FCS-homo and "mice.impute.2l.jomo" for FCS-hetero}
+\item{method.mice}{a vector of strings (or a single string) giving the imputation method for each variable (only used for method = FCS-homo or method = FCS-hetero). Default value is "pmm" (predictive mean matching) for FCS-homo and "mice.impute.2l.jomo" for FCS-hetero}
 
 \item{predictmat}{predictor matrix used for FCS imputation (only used for method = FCS-homo or method = FCS-hetero)}
 
@@ -70,7 +70,7 @@ wine.na$cult <- NULL
 wine.na <- as.matrix(wine.na)
 wine.na[sample(seq(length(wine.na)), size = ceiling(length(wine.na)/3))] <- NA
 nb.clust <- 3 # number of clusters
-m <- 3 # number of imputed data sets
+m <- 20 # number of imputed data sets
 res.imp <- imputedata(data.na = wine.na, nb.clust = nb.clust, m = m)
 lapply(res.imp$res.imp, summary)
 }

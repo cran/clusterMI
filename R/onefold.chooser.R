@@ -79,7 +79,7 @@ onefold.chooser<-function(data.train.k,
     clustering <- Mclust(rbind(data.train.k.small,data.test.k.small),
                          G=nb.clust,
                          initialization = list(hcPairs = res.init.hc),
-                         modelNames=modelNames)$classification
+                         modelNames=modelNames,verbose=FALSE)$classification
     Xtrain.imp<-data.train.k.small
     Xtest.imp<-data.test.k.small
   }

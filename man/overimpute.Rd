@@ -57,17 +57,25 @@ wine.na[sample(seq(length(wine.na)), size = ceiling(length(wine.na)/3))] <- NA
 \donttest{
 nnodes <- 2 # Number of CPU cores used for parallel computation
 
-# Multiple imputation (with m = 100, but use m>200 in practice) 
+# Multiple imputation
 
 res.imp.over <- imputedata(data.na = wine.na,
                            nb.clust = nb.clust,
-                           m = 100)
+                           m = 200)
 # Overimputation
-                            
+
+## overimputed variable
+plotvars <- "alco" 
+
+## selection of 20 complete individuals on variable "alco"
+plotinds <- sample(which(!is.na(wine.na[, plotvars])),
+                    size = 20)
+## overimputation                   
 res.over <- overimpute(res.imp.over,
                        nnodes = nnodes,
-                       plotvars = 1,
-                       plotinds = sample(seq(nrow(wine.na)), size = 30))
+                       plotvars = plotvars,
+                       plotinds = plotinds,
+                       )
 }
 }
 \references{

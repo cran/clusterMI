@@ -123,7 +123,7 @@ chooser<-function(res.varsel,#resultat varselbest
     rmin<- -Inf
     erreur<-matrix(NA,K,length(grid.r),dimnames = list(seq(K),grid.r))
     for(k in seq(K)){
-      if(printflag){cat(k,"...")}
+      if(printflag){cat(k,"...",sep="")}
       data.train.k<-data.na[-Kfold[[k]],]
       data.test.k<-data.na[Kfold[[k]],]
       res.onefold<-onefold.chooser(data.train.k=data.train.k,
