@@ -42,11 +42,11 @@
 #' \donttest{
 #' nnodes <- 2 # Number of CPU cores used for parallel computation
 #' 
-#' # Multiple imputation
+#' # Multiple imputation using m = 100 (should be larger in practice)
 #' 
 #' res.imp.over <- imputedata(data.na = wine.na,
 #'                            nb.clust = nb.clust,
-#'                            m = 200)
+#'                            m = 100)
 #' # Overimputation
 #' 
 #' ## overimputed variable
@@ -164,12 +164,14 @@ overimpute <- function (res.imputedata, plotvars = NULL, plotinds = NULL, nnodes
   }else{
     Mfrow<-mfrow
   }
-  pct <- round(100*mean(((res.over[, "trueval"] <= res.over[, 
-                                                        "bsup"]) & (res.over[, "trueval"] >= res.over[, "binf"]))), 
-               2)
+  pct <- unlist(by(res.over,INDICES = res.over$var,function(res.over){
+    round(100*mean(((res.over[, "trueval"] <= res.over[, "bsup"]) & (res.over[, "trueval"] >= res.over[, "binf"]))), 
+                                                                          2)},simplify = FALSE))
+  pct.rep<-pct[res.over$var]
+  res.over$pct <- pct.rep
   par(mfrow = Mfrow, mar = mar)
-  by(res.over, INDICES = res.over$var, FUN = function(xx, 
-                                                      pct) {
+  by(res.over, INDICES = res.over$var, FUN = function(xx) {
+    pct <- xx$pct[1]
     plot(x = xx[, "trueval"], y = xx[, "xbar"], col = as.character(xx[, 
                                                                       "col"]), xlab = "observed values", ylab = "imputed values", 
          main = paste(xx[1, "var"], " (cov =", pct,"%)"), 
@@ -183,7 +185,7 @@ overimpute <- function (res.imputedata, plotvars = NULL, plotinds = NULL, nnodes
                                      "0.4-0.6", "0.6-0.8", "0.8-1"), col = c("blue", 
                                                                              "green", heat.colors(3)[c(3, 2, 1)]), bty = "n", 
            lty = 1, horiz = TRUE, cex = 1, lwd = 0.4)
-  }, pct = pct)
+  })
   # par(xpd=TRUE)
   # plot(1, type = "n", axes=FALSE, xlab="", ylab="")
   # legend("top", inset=0, legend=names(pch), pch=pch,bg=bg[1],bty = "n",cex=1.1,horiz=TRUE) 

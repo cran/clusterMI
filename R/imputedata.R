@@ -478,7 +478,8 @@ imputedata<-function(data.na,method="JM-GL",
           if("try-error"%in%class(res.try)){
             newtheta<-try(da.mix(res.myem$s,newtheta,steps=L),silent=TRUE)
             if("try-error"%in%class(newtheta)){
-              stop("Imputation using JM-GL fails. Try to change the seed argument or use another imputation method (i.e. FCS-homo)") 
+              warning("Imputation using JM-GL fails. Try to change the seed argument or use another imputation method (i.e. FCS-homo)") 
+              (break)()
               }
             }else{newtheta<-res.try}
           res.imp[[tab]]<-as.data.frame(imp.mix(res.myem$s,newtheta))

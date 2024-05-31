@@ -57,11 +57,11 @@ wine.na[sample(seq(length(wine.na)), size = ceiling(length(wine.na)/3))] <- NA
 \donttest{
 nnodes <- 2 # Number of CPU cores used for parallel computation
 
-# Multiple imputation
+# Multiple imputation using m = 100 (should be larger in practice)
 
 res.imp.over <- imputedata(data.na = wine.na,
                            nb.clust = nb.clust,
-                           m = 200)
+                           m = 100)
 # Overimputation
 
 ## overimputed variable
