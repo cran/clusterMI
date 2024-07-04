@@ -79,8 +79,7 @@ ref <- wine$cult
 nb.clust <- 3
 wine.na <- wine
 wine.na$cult <- NULL
-wine.na <- as.matrix(wine.na)
-wine.na[sample(seq(length(wine.na)), size = ceiling(length(wine.na)/3))] <- NA
+wine.na <- prodna(wine.na)
 
 \donttest{
 nnodes <- 2 # parallel::detectCores()

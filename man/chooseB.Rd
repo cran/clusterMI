@@ -6,37 +6,34 @@
 \usage{
 chooseB(
   res.varselbest,
-  gridB = NULL,
-  xlim = NULL,
-  plotvars = NULL,
-  cex = 0.2,
-  type = "b",
+  plotvar = NULL,
+  linewidth = 1,
+  linetype = "dotdash",
   xlab = "B",
-  ylab = "proportion",
-  graph = TRUE,
-  pch = 16
+  ylab = "Proportion",
+  nrow = 2,
+  ncol = 2,
+  graph = TRUE
 )
 }
 \arguments{
 \item{res.varselbest}{an output from the varselbest function}
 
-\item{gridB}{a grid for the number of iterations. By default, the grid is tuned to \code{1:B} where \code{B} is the argument used in varselbest.}
+\item{plotvar}{index of variables for which a curve is ploted}
 
-\item{xlim}{the x limits (x1, x2) of the plot}
+\item{linewidth}{a numerical value setting the widths of lines}
 
-\item{plotvars}{index of variables for which a curve is plotted}
-
-\item{cex}{a numerical vector giving the amount by which plotting characters and symbols should be scaled relative to the default}
-
-\item{type}{what type of plot should be drawn}
+\item{linetype}{what type of plot should be drawn}
 
 \item{xlab}{a title for the x axis}
 
 \item{ylab}{a title for the y axis}
 
-\item{graph}{a boolean. If FALSE, no graphics are plotted. Default value is TRUE}
+\item{nrow}{argument of gtable. Default value is 2.}
 
-\item{pch}{an integer}
+\item{ncol}{argument of gtable. Default value is 2.}
+
+\item{graph}{a boolean. If FALSE, no graphics are ploted. Default value is TRUE}
 }
 \value{
 a list of matrices where each row corresponds to the vector of proportions (for all explanatory variables) obtained for a given value of B
@@ -59,8 +56,7 @@ ref <- wine$cult
 nb.clust <- 3
 wine.na<-wine
 wine.na$cult <- NULL
-wine.na <- as.matrix(wine.na)
-wine.na[sample(seq(length(wine.na)), size = ceiling(length(wine.na)/3))] <- NA
+wine.na <- prodna(wine.na)
 
 nnodes <- 2 # Number of CPU cores for parallel computing
 B <- 80 # Number of iterations for variable selection

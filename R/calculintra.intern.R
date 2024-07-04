@@ -1,7 +1,15 @@
 #' @importFrom FactoMineR MCA FAMD
 #' @importFrom fpc kmeansCBI nselectboot claraCBI noisemclustCBI hclustCBI
+#' @importFrom stats dist
 
-calculintra.intern<-function(res.imp,method.clustering,Cboot,nb.clust,scaling,method.agnes,nstart.kmeans,modelNames,m.cmeans){
+calculintra.intern<-function(res.imp,
+                             method.clustering,
+                             method.dist,Cboot,
+                             nb.clust,scaling,
+                             method.agnes,
+                             nstart.kmeans,
+                             modelNames,
+                             m.cmeans){
   
   if(sum(sapply(res.imp,is.numeric))==ncol(res.imp)){
     #quanti
@@ -15,12 +23,10 @@ calculintra.intern<-function(res.imp,method.clustering,Cboot,nb.clust,scaling,me
   }
   if(method.clustering=="kmeans"){
     clustermethod<-kmeansCBI
-    # print(res.imp.intern)
     res.out<-nselectboot(data=res.imp.intern,B=Cboot,clustermethod=clustermethod,
                          classification="centroid",krange=nb.clust,scaling=FALSE,count = FALSE,runs=nstart.kmeans)$stabk[nb.clust]}
   if(method.clustering=="cmeans"){
     clustermethod<-cmeansCBI.intern
-    # print(res.imp.intern)
     res.out<-nselectboot(data=res.imp.intern,B=Cboot,clustermethod=clustermethod,
                          classification="centroid",krange=nb.clust,scaling=FALSE,m.cmeans=m.cmeans)$stabk[nb.clust]}
   if(method.clustering%in%c("pam","clara")){
@@ -29,17 +35,19 @@ calculintra.intern<-function(res.imp,method.clustering,Cboot,nb.clust,scaling,me
                          classification="centroid",krange=nb.clust,usepam=(method.clustering=="pam"))$stabk[nb.clust]
   }
   if(method.clustering=="mixture"){
-    # print(str(res.imp.intern))
     methodclassif<-ifelse(test=modelNames%in%c("EEE","EEI","EII"),yes = "lda",no="qda")
     res.out<-nselectboot(data=res.imp.intern,B=Cboot,clustermethod=noisemclustCBI,
                          classification=methodclassif,krange=nb.clust,multipleboot=FALSE,modelNames=modelNames,verbose = FALSE)$stabk[nb.clust]
   }
-  if(method.clustering=="agnes"){
-    # print("okagnes")
-    method.agnes.tmp<-method.agnes
-    if(method.agnes=="gaverage"){method.agnes.tmp<-"average"}
+  if(method.clustering=="hclust"){
     clustermethod<-hclustCBI
-    res.out<-nselectboot(data=res.imp.intern,B=Cboot,clustermethod=clustermethod,
-                         classification="averagedist",krange=nb.clust,scaling=FALSE,method=method.agnes.tmp)$stabk[nb.clust]}
+    res.out<-nselectboot(data=dist(res.imp.intern,method = method.dist),
+                         B=Cboot,
+                         distances = TRUE,
+                         clustermethod=clustermethod,
+                         classification="averagedist",
+                         krange=nb.clust,
+                         scaling=FALSE,
+                         method=method.agnes)$stabk[nb.clust]}
   return(res.out)
 }

@@ -8,12 +8,13 @@ choosemaxit(
   output,
   plotvars = NULL,
   plotm = 1:5,
-  cex = 0.3,
-  pch = 16,
-  type = "b",
+  size = 0.5,
+  linewidth = 1,
+  linetype = "dotdash",
   xlab = "iterations",
   ylab = "var",
-  layout = NULL
+  title = "Within and between variance plots",
+  nvar_by_row = 5
 )
 }
 \arguments{
@@ -23,17 +24,19 @@ choosemaxit(
 
 \item{plotm}{a vector indicating which imputed datasets must be plotted}
 
-\item{cex}{a numerical vector giving the amount by which plotting characters and symbols should be scaled relative to the default}
+\item{size}{size of points}
 
-\item{pch}{a vector of plotting characters or symbols}
+\item{linewidth}{a numerical value setting the widths of lines}
 
-\item{type}{what type of plot should be drawn}
+\item{linetype}{what type of plot should be drawn}
 
 \item{xlab}{a title for the x axis}
 
 \item{ylab}{a title for the y axis}
 
-\item{layout}{a vector of the form c(nrow, ncol)}
+\item{title}{the main title}
+
+\item{nvar_by_row}{the number of variables that are plotted per window. Default value is 5.}
 }
 \value{
 No return value
@@ -46,14 +49,13 @@ data(wine)
 set.seed(123456)
 wine.na <- wine
 wine.na$cult <- NULL
-wine.na <- as.matrix(wine.na)
-wine.na[sample(seq(length(wine.na)), size = ceiling(length(wine.na)/3))] <- NA
+wine.na <- prodna(wine.na)
 nb.clust <- 3 # number of clusters
 m <- 3 # number of imputed data sets
 maxit <- 50 # number of iterations for FCS imputation
 \donttest{
 res.imp <- imputedata(data.na = wine.na, method = "FCS-homo",
                       nb.clust = nb.clust, m = m, maxit = maxit)
-choosemaxit(res.imp, cex = .7)
+choosemaxit(res.imp)
 }
 }

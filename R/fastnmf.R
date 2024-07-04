@@ -21,6 +21,7 @@
 #' @references T. Li, C. Ding, and M. I. Jordan (2007) Solving consensus and semi-supervised clustering problems using nonnegative matrix factorization.  In Proceedings of the 2007 Seventh IEEE International Conference on Data Mining, ICDM'07, page 577-582, USA. IEEE Computer Society. <doi:10.1109/ICDM.2007.98>
 #' @importFrom ClusterR MiniBatchKmeans predict_MBatchKMeans
 #' @importFrom Rfast Crossprod Tcrossprod mat.mult
+#' @importFrom stats kmeans
 #' @export
 #' @examples
 #' data(wine)
@@ -31,8 +32,7 @@
 #' m <- 3 # number of imputed data sets. Should be larger in practice
 #' wine.na <- wine
 #' wine.na$cult <- NULL
-#' wine.na <- as.matrix(wine.na)
-#' wine.na[sample(seq(length(wine.na)), size = ceiling(length(wine.na)/3))] <- NA
+#' wine.na <- prodna(wine.na)
 #' 
 #' #imputation
 #' res.imp <- imputedata(data.na = wine.na, nb.clust = nb.clust, m = m)

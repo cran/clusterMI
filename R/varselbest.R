@@ -44,8 +44,7 @@
 #' nb.clust <- 3
 #' wine.na <- wine
 #' wine.na$cult <- NULL
-#' wine.na <- as.matrix(wine.na)
-#' wine.na[sample(seq(length(wine.na)), size = ceiling(length(wine.na)/3))] <- NA
+#' wine.na <- prodna(wine.na)
 #' 
 #' \donttest{
 #' nnodes <- 2 # parallel::detectCores()
@@ -165,7 +164,7 @@ if(graph){
   oldpar <- par(no.readonly = TRUE)
   on.exit(par(oldpar))
   par(mfrow = Mfrow,mar=mar)
-  tmp<-mapply(res.varsel,listvar.intern,FUN = function(xx,varindex){chooseB.intern(xx);title(varindex)})
+  tmp<-mapply(res.varsel,listvar.intern,FUN = function(xx,varindex){chooseB.intern(xx,title=varindex)})
   # par(mfrow = Mfrow_old)
 }
 if (printflag){cat("done!\n")}

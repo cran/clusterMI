@@ -11,7 +11,7 @@
 #' Note that two other joint modelling methods are also available: \code{JM-GL} from the R package \code{mix} and \code{JM-DP} from the R package \code{DPImputeCont} \url{https://github.com/hang-j-kim/DPImputeCont}
 #' @return a list of 3 objets
 #'  \item{res.imp}{ a list with the several imputed datasets}
-#'  \item{res.conv}{ for FCS methods, an array given the within inertia of each imputed variable at each iteration and for each imputed dataset}
+#'  \item{res.conv}{ for FCS methods, an array given the between (and within) inertia of each imputed variable at each iteration and for each imputed dataset. For JM methods, a matrix given the between inertia for each variable and each imputed dataset.}
 #'  \item{call}{ the matching call}
 #' 
 #' @param data.na an incomplete dataframe
@@ -46,16 +46,25 @@
 #' set.seed(123456)
 #' wine.na <- wine
 #' wine.na$cult <- NULL
-#' wine.na <- as.matrix(wine.na)
-#' wine.na[sample(seq(length(wine.na)), size = ceiling(length(wine.na)/3))] <- NA
+#' wine.na <- prodna(wine.na)
 #' nb.clust <- 3 # number of clusters
 #' m <- 20 # number of imputed data sets
 #' res.imp <- imputedata(data.na = wine.na, nb.clust = nb.clust, m = m)
 #' lapply(res.imp$res.imp, summary)
 
-imputedata<-function(data.na,method="JM-GL",
-                    nb.clust=NULL,m=20,maxit=50,Lstart=100,L=20,method.mice=NULL,
-                    predictmat=NULL,verbose=TRUE, seed=1234, bootstrap = FALSE){
+imputedata<-function(data.na,
+                     method="JM-GL",
+                    nb.clust=NULL,
+                    m=20,
+                    maxit=50,
+                    Lstart=100,
+                    L=20,
+                    method.mice=NULL,
+                    predictmat=NULL,
+                    verbose=TRUE,
+                    seed=1234,
+                    bootstrap = FALSE){
+  if(!is.data.frame(data.na)){stop("data.na need to be a dataframe.")}
   if(sum(is.na(data.na))==0){stop("The dataset must be incomplete")}
   if(is.null(nb.clust)){stop("The number of clusters (nb.clust) must be specified")}
   if(is.null(colnames(data.na))){stop("Colnames of data.na are missing")}
@@ -79,10 +88,24 @@ imputedata<-function(data.na,method="JM-GL",
   }
   
   #check colnames for predicmat
-  if(!is.null(predictmat)){if(!(identical(colnames(predictmat),colnames(data.na)))){stop("The column names for predictmat and data.na do not match")}}
-  Call<-list(data.na=data.na,method=method,
-  nb.clust=nb.clust,m=m,maxit=maxit,Lstart=Lstart,L=L,method.mice=method.mice,
-  predictmat=predictmat,data.type=data.type,bootstrap=bootstrap)
+  if(!is.null(predictmat)){
+    if(!(identical(colnames(predictmat),colnames(data.na)))){
+      stop("The column names for predictmat and data.na do not match")}
+  }
+  
+  
+  Call<-list(data.na=data.na,
+             method=method,
+  nb.clust=nb.clust,
+  m=m,
+  maxit=maxit,
+  Lstart=Lstart,
+  L=L,
+  method.mice=method.mice,
+  predictmat=predictmat,
+  data.type=data.type,
+  bootstrap=bootstrap)
+  
   if(is.null(method.mice)){method.mice.homo<-NULL;method.mice.hetero<-"2l.jomo"}else{
   if("FCS-homo"%in%method){method.mice.homo<-method.mice}else if("FCS-hetero"%in%method){method.mice.hetero<-method.mice}}
   # if("FCS-homo"%in%method){bootstrap<-TRUE}else if("FCS-hetero"%in%method){bootstrap<-FALSE}
@@ -454,35 +477,38 @@ imputedata<-function(data.na,method="JM-GL",
   if("JM-GL"%in%method){
     res.imp<-list()
     rngseed(seed)
+    temp.part<-matrix(NA,nrow=m,ncol=nrow(data.na))
     if(data.type%in%c("continuous","mixed")){
      
       data.na.intern<-data.na
         quali.index<-which(sapply(data.na,is.factor)|(sapply(data.na,is.ordered)))
-
+        quanti.index<-which(!(sapply(data.na,is.factor)|(sapply(data.na,is.ordered))))
         if(data.type=="mixed"){
           quanti.index<-which(!(sapply(data.na,is.factor)|(sapply(data.na,is.ordered))))
           data.na.intern[,quali.index]<-sapply(data.na.intern[,quali.index],as.numeric)
           data.na.intern<-data.na.intern[,c(quali.index,quanti.index)]
         }
-        # print(data.na.intern)
         res.myem<-myem.mix(dataset = data.na.intern,
                            K = nb.clust,
                            silent = TRUE,
                            nbquali=length(quali.index))
         
         newtheta<-try(da.mix(res.myem$s,res.myem$theta,steps=ceiling(Lstart),prior=res.myem$theta$pi), silent = TRUE)
-        if("try-error"%in%class(newtheta)){newtheta<-try(da.mix(res.myem$s,res.myem$theta,steps=ceiling(Lstart)),silent = TRUE)}
+        if(inherits(newtheta,"try-error")){newtheta<-try(da.mix(res.myem$s,res.myem$theta,steps=ceiling(Lstart)),silent = TRUE)}
         for(tab in seq.int(m)){
           if(verbose){cat(tab,"...",sep="")}
           res.try<-try(da.mix(res.myem$s,newtheta,steps=L,prior=res.myem$theta$pi),silent = TRUE)
-          if("try-error"%in%class(res.try)){
+          if(inherits(res.try,"try-error")){
             newtheta<-try(da.mix(res.myem$s,newtheta,steps=L),silent=TRUE)
             if("try-error"%in%class(newtheta)){
-              warning("Imputation using JM-GL fails. Try to change the seed argument or use another imputation method (i.e. FCS-homo)") 
+              warning(paste0("Imputation using JM-GL fails to impute ",m," datasets. Try to change the seed argument or use another imputation method (i.e. FCS-homo)"))
               (break)()
               }
             }else{newtheta<-res.try}
           res.imp[[tab]]<-as.data.frame(imp.mix(res.myem$s,newtheta))
+          #on stocke la partition
+          temp.part[tab,] <- res.imp[[tab]]$class
+          
           res.imp[[tab]]$class<-NULL
           if(data.type=="mixed"){
             res.imp[[tab]][,names(quali.index)]<-lapply(res.imp[[tab]][,names(quali.index),drop=FALSE],as.factor)
@@ -492,6 +518,23 @@ imputedata<-function(data.na,method="JM-GL",
             res.imp[[tab]]<-res.imp[[tab]][,colnames(data.na)]
           }
         }
+        maxm <- sum(!sapply(res.imp,is.null))
+        res.conv<-sapply(seq.int(maxm),FUN = function(ii,res.imp,part,quanti.index){
+          apply(res.imp[[ii]][,quanti.index,drop=FALSE],2,
+                FUN=function(xx,ref){
+                  res.by<-do.call(rbind,by(xx,INDICES=ref,
+                                           FUN=function(yy){
+                                             meangp<-mean(yy)
+                                             fregp<-length(yy)
+                                             res.out<-c(mean=meangp,freq=fregp)
+                                             return(res.out)
+                                           }))
+                  inter<-sum(((res.by[,"mean"]-mean(xx))^2)*(res.by[,"freq"]))/sum(res.by[,"freq"])
+                  return(inter)
+                },ref=part[ii,])
+        },res.imp=res.imp,
+        part=temp.part,
+        quanti.index= quanti.index) 
     }else{
       data.na.intern<-sapply(data.na,function(xx){as.numeric(xx)})
       res.myem<-myem.cat(dataset = data.na.intern,
@@ -516,14 +559,29 @@ imputedata<-function(data.na,method="JM-GL",
     if(verbose){cat("done!\n")}
   }
   if("JM-DP"%in%method){
-    # require(DPImputeCont)
     if(data.type=="continuous"){
+      if(L==1){warning("The current version of JM-DP requires L>1")}
     data_obj <- readData(Y_in = data.na,99)
     model_obj <- createModel(data_obj, K_mix_comp = nb.clust)
-    result_obj <- multipleImp(model_obj = model_obj, data_obj=data_obj,n_burnin = Lstart, m_Imp =m, interval_btw_Imp = L)
+    result_obj <- multipleImp(model_obj = model_obj, data_obj=data_obj,n_burnin = Lstart, m_Imp =m, interval_btw_Imp = L,show_iter = verbose)
+    res.conv<-sapply(seq.int(m),FUN = function(ii,res.imp,part){
+      apply(res.imp[ii,,],2,
+            FUN=function(xx,ref){
+              res.by<-do.call(rbind,by(xx,INDICES=ref,
+                                       FUN=function(yy){
+                                         meangp<-mean(yy)
+                                         fregp<-length(yy)
+                                         res.out<-c(mean=meangp,freq=fregp)
+                                         return(res.out)
+                                       }))
+              inter<-sum(((res.by[,"mean"]-mean(xx))^2)*(res.by[,"freq"]))/sum(res.by[,"freq"])
+              return(inter)
+            },ref=part[ii,])
+    },res.imp=result_obj$multiple_Imp,part=result_obj$multiple_Z_vec)
+    
+    rownames(res.conv)<-colnames(data.na)
     res.imp<-list()
     for(tab in seq.int(m)){
-      # if(verbose){cat(tab,"...",sep="")}
       res.imp[[tab]]<-as.data.frame(result_obj$multiple_Imp[tab,,])
       colnames(res.imp[[tab]])<-colnames(data.na)
     }

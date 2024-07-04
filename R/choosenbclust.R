@@ -16,7 +16,6 @@
 #' @param verbose if TRUE, choosenbclust will print messages on console
 #' @param nnodes number of CPU cores for parallel computing. By default, the value used in the call to the clusterMI function
 #' @export
-#' @importFrom cluster pam agnes
 #' @importFrom diceR CSPA
 #' @importFrom FactoMineR PCA MCA FAMD
 #' @importFrom fpc kmeansCBI nselectboot claraCBI noisemclustCBI hclustCBI
@@ -25,7 +24,6 @@
 #' @importFrom mice mice complete
 #' @importFrom graphics axis
 #' @importFrom stats kmeans cutree
-#' @importFrom usedist dist_make
 #' @seealso \code{\link{imputedata}}
 #' @references 
 #'  Audigier, V. and Niang, N., Clustering with missing data: which equivalent for Rubin's rules? Advances in Data Analysis and Classification <doi:10.1007/s11634-022-00519-1>, 2022.
@@ -38,8 +36,7 @@
 #' nb.clust <- 3
 #' wine.na <- wine
 #' wine.na$cult <- NULL
-#' wine.na <- as.matrix(wine.na)
-#' wine.na[sample(seq(length(wine.na)), size = ceiling(length(wine.na)/3))] <- NA
+#' wine.na <- prodna(wine.na)
 #' 
 #' # imputation
 #' res.imp <- imputedata(data.na=wine.na, nb.clust = nb.clust, m = 5)
@@ -70,22 +67,59 @@ choosenbclust<-function (output, grid = 2:5, graph = TRUE, verbose = TRUE,
   }
   if (nnodes.intern > 1) {
     cl <- parallel::makeCluster(nnodes.intern, type = "PSOCK")
-    parallel::clusterExport(cl, list("grid", "output", "imputedata", 
-                                     "em.mix", "imp.mix", "da.mix", "prelim.mix", "rngseed", 
-                                     "Mclust", "mice", "complete", "readData", "createModel", 
-                                     "multipleImp", "rdirichlet"), envir = environment())
+    parallel::clusterExport(cl, list("grid", "output",
+                                     "imputedata",
+                                     #appels imputedata
+                                     "myem.mix",
+                                     "myimp.mix",
+                                     "myimp.cat",
+                                     "mclustboot.intern",
+                                     "drawW",
+                                     "readData",
+                                     "createModel", 
+                                     "multipleImp",
+                                     "rdirichlet",
+                                     "rngseedcat",
+                                     "em.mix",
+                                     "imp.mix",
+                                     "da.mix",
+                                     "prelim.mix",
+                                     "rngseed",
+                                    "em.cat",
+                                    "imp.cat",
+                                    "da.cat",
+                                    "prelim.cat",
+                                     "Mclust",
+                                    "mclustBIC",
+                                    "MclustBootstrap",
+                                     "mice",
+                                     "complete",
+                                    "DPMPM_nozeros_imp"), envir = environment())
     res.imp <- parallel::parLapply(cl, grid, fun = imputedata, 
-                                   data.na = output$call$output$call$data.na, method = output$call$output$call$method, 
-                                   m = output$call$output$call$m, maxit = output$call$output$call$maxit, 
-                                   Lstart = output$call$output$call$Lstart, L = output$call$output$call$L, 
+                                   data.na = output$call$output$call$data.na,
+                                   method = output$call$output$call$method, 
+                                   m = output$call$output$call$m,
+                                   maxit = output$call$output$call$maxit, 
+                                   Lstart = output$call$output$call$Lstart,
+                                   L = output$call$output$call$L,
+                                   method.mice=output$call$method.mice,
+                                   predictmat = output$call$predictmat,
+                                   bootstrap = output$call$bootstrap,
                                    verbose = FALSE)
     parallel::stopCluster(cl)
   }
   else {
-    res.imp <- lapply(grid, FUN = imputedata, data.na = output$call$output$call$data.na, 
-                      method = output$call$output$call$method, m = output$call$output$call$m, 
-                      maxit = output$call$output$call$maxit, Lstart = output$call$output$call$Lstart, 
-                      L = output$call$output$call$L, verbose = FALSE)
+    res.imp <- lapply(grid, FUN = imputedata,
+                      data.na = output$call$output$call$data.na, 
+                      method = output$call$output$call$method,
+                      m = output$call$output$call$m, 
+                      maxit = output$call$output$call$maxit,
+                      Lstart = output$call$output$call$Lstart, 
+                      L = output$call$output$call$L,
+                      method.mice=output$call$method.mice,
+                      predictmat = output$call$predictmat,
+                      bootstrap = output$call$bootstrap,
+                      verbose = FALSE)
   }
   if (verbose) {
     cat(" done!\n")
@@ -97,30 +131,91 @@ choosenbclust<-function (output, grid = 2:5, graph = TRUE, verbose = TRUE,
   }
   if (nnodes.intern > 1) {
     cl <- parallel::makeCluster(nnodes.intern, type = "PSOCK")
-    parallel::clusterExport(cl, list("output", "res.imp", 
-                                     "cmeans", "kmeans", "cutree", "setTxtProgressBar", 
-                                     "txtProgressBar", "dist_make", "kmeansCBI", "nselectboot", 
-                                     "claraCBI", "noisemclustCBI", "hclustCBI", "CSPA", 
-                                     "pam", "agnes", "clara", "daisy", "silhouette", 
-                                     "PCA", "MCA", "FAMD", "Mclust", "hc", "hcEEE", "hcVVV", 
-                                     "hcVII", "hcEII"), envir = environment())
-    res.rubin <- parallel::parLapply(cl, res.imp, fun = clusterMI, 
-                                     method.consensus = output$call$method.consensus, 
+    parallel::clusterExport(cl, list("output",
+                                     "res.imp",
+                                     #fonctions requises par calculintra (fpc)
+                                     "kmeansCBI",
+                                     "nselectboot", 
+                                     "claraCBI",
+                                     "noisemclustCBI",
+                                     "hclustCBI",
+                                     "cmeansCBI.intern",
+                                     #fonctions appellees par clusterMI
+                                     "fastnmf",
+                                     "calculintra.intern",
+                                     "cluster.intern",
+                                     "clusterMI",
+                                     "calcul_inter",
+                                     "randindex",
+                                     "CSPA",
+                                     #fonctions appelees par cluster.intern
+                                     "Silhouette.intern",
+                                     "cmeans",
+                                     "kmeans",
+                                     "hclust",
+                                     "cutree",
+                                     "setTxtProgressBar", 
+                                     "txtProgressBar",
+                                     "with_seed",
+                                     "Mclust",
+                                     "hc",
+                                     "hcEEE",
+                                     "hcVVV", 
+                                     "hcVII",
+                                     "hcEII",
+                                     #factominer
+                                     "PCA",
+                                     "MCA",
+                                     "FAMD"), envir = environment())
+    res.rubin <- parallel::parLapply(cl, res.imp, fun = clusterMI,
                                      method.clustering = output$call$method.clustering, 
-                                     scaling = output$call$scaling, nb.clust = output$call$nb.clust.intern, 
-                                     Cboot = output$call$Cboot, method.agnes = output$call$method.agnes, 
-                                     modelNames = output$call$modelNames, nstart.kmeans = output$call$nstart.kmeans, 
-                                     m.cmeans = output$call$m.cmeans, nnodes = 1, verbose = FALSE)
+                                     method.consensus = output$call$method.consensus, 
+                                     scaling = output$call$scaling,
+                                     nb.clust = output$call$nb.clust.intern, 
+                                     Cboot = output$call$Cboot,
+                                     method.hclust = output$call$method.hclust,
+                                     method.dist =  output$call$method.dist,
+                                     modelNames = output$call$modelNames,
+                                     modelName.hc=output$call$modelName.hc,
+                                     nstart.kmeans = output$call$nstart.kmeans, 
+                                     iter.max.kmeans = output$call$iter.max.kmeans,
+                                     m.cmeans = output$call$m.cmeans,
+                                     nnodes = 1,
+                                     instability = TRUE,
+                                     verbose = FALSE,
+                                     nmf.threshold = output$call$nmf.threshold,
+                                     nmf.nstart = output$call$nmf.nstart,
+                                     nmf.early_stop_iter = output$call$nmf.early_stop_iter,
+                                     nmf.initializer = output$call$nmf.initializer,
+                                     nmf.batch_size = output$call$nmf.batch_size,
+                                     nmf.iter.max = output$call$nmf.iter.max
+                                     )
     parallel::stopCluster(cl)
   }
   else {
-    res.rubin <- lapply(res.imp, FUN = clusterMI, method.consensus = output$call$method.consensus, 
+    res.rubin <- lapply(res.imp,
+                        FUN = clusterMI,
                         method.clustering = output$call$method.clustering, 
-                        scaling = output$call$scaling, nb.clust = output$call$nb.clust.intern, 
-                        Cboot = output$call$Cboot, method.agnes = output$call$method.agnes, 
-                        modelNames = output$call$modelNames, nstart.kmeans = output$call$nstart.kmeans, 
-                        m.cmeans = output$call$m.cmeans, nnodes = output$call$nnodes, 
-                        verbose = FALSE)
+                        method.consensus = output$call$method.consensus, 
+                        scaling = output$call$scaling,
+                        nb.clust = output$call$nb.clust.intern,
+                        Cboot = output$call$Cboot,
+                        method.hclust = output$call$method.hclust,
+                        method.dist =  output$call$method.dist,
+                        modelNames = output$call$modelNames,
+                        modelName.hc=output$call$modelName.hc,
+                        nstart.kmeans = output$call$nstart.kmeans, 
+                        iter.max.kmeans = output$call$iter.max.kmeans,
+                        m.cmeans = output$call$m.cmeans,
+                        nnodes = output$call$nnodes,
+                        instability = TRUE,
+                        verbose = FALSE,
+                        nmf.threshold = output$call$nmf.threshold,
+                        nmf.nstart = output$call$nmf.nstart,
+                        nmf.early_stop_iter = output$call$nmf.early_stop_iter,
+                        nmf.initializer = output$call$nmf.initializer,
+                        nmf.batch_size = output$call$nmf.batch_size,
+                        nmf.iter.max = output$call$nmf.iter.max)
   }
   if (verbose) {
     cat(" done!\n")

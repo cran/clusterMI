@@ -8,9 +8,9 @@
 A class required when using the \code{imputedata} function with argument \code{method = "JM-DP"}
 }
 \section{Extends}{
-Class \code{"\linkS4class{C++Object}"}, directly.
+Class "C++Object", directly.
 
-All reference classes extend and inherit methods from \code{"\linkS4class{envRefClass}"}.
+All reference classes extend and inherit methods from "envRefClass".
 
 }
 \author{

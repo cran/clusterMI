@@ -58,8 +58,7 @@ nb.clust <- 3
 m <- 3 # number of imputed data sets. Should be larger in practice
 wine.na <- wine
 wine.na$cult <- NULL
-wine.na <- as.matrix(wine.na)
-wine.na[sample(seq(length(wine.na)), size = ceiling(length(wine.na)/3))] <- NA
+wine.na <- prodna(wine.na)
 
 #imputation
 res.imp <- imputedata(data.na = wine.na, nb.clust = nb.clust, m = m)

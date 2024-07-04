@@ -6,29 +6,20 @@
 \usage{
 chooseB.intern(
   res.varselbest,
-  gridB = NULL,
-  xlim = NULL,
-  plotvar = NULL,
-  cex = 0.2,
-  type = "b",
+  linewidth = 1,
+  linetype = "dotdash",
   xlab = "B",
-  ylab = "proportion",
+  ylab = "Proportion",
   graph = TRUE,
-  pch = 16
+  title = NULL
 )
 }
 \arguments{
 \item{res.varselbest}{an output from the varselbest function}
 
-\item{gridB}{a grid for the number of iterations. By default, the grid is tuned to 1:B where B is the argument used in varselbest.}
+\item{linewidth}{a numerical value setting the widths of lines}
 
-\item{xlim}{the x limits (x1, x2) of the plot}
-
-\item{plotvar}{index of variables for which a curve is ploted}
-
-\item{cex}{a numerical vector giving the amount by which plotting characters and symbols should be scaled relative to the default}
-
-\item{type}{what type of plot should be drawn}
+\item{linetype}{what type of plot should be drawn}
 
 \item{xlab}{a title for the x axis}
 
@@ -36,7 +27,7 @@ chooseB.intern(
 
 \item{graph}{a boolean. If FALSE, no graphics are ploted. Default value is TRUE}
 
-\item{pch}{an integer}
+\item{title}{the main title}
 }
 \description{
 Tune the number of iterations for variable selection using varselbest

@@ -2,8 +2,8 @@ Encoding: UTF-8
 Package: clusterMI
 Type: Package
 Title: Cluster Analysis with Missing Values by Multiple Imputation
-Version: 1.1.1
-Date: 2024-05-28
+Version: 1.2
+Date: 2024-07-03
 Authors@R: c(
   person("Vincent","Audigier",email="vincent.audigier@cnam.fr",role=c("aut","cre"),comment="CNAM MSDMA team"),
   person("Hang Joon","Kim",email="hang.kim@uc.edu",role=c("ctb"),comment="University of Cincinnati"))
@@ -12,20 +12,20 @@ Description: Allows clustering of incomplete observations by addressing missing 
 License: GPL-2 | GPL-3
 Depends: R (>= 3.5.0)
 Imports: stats, graphics, parallel, mice, micemd, mclust, mix, fpc,
-        usedist, knockoff, withr, glmnet, cluster, ClusterR,
-        FactoMineR, diceR, NPBayesImputeCat, e1071, Rfast, cat, utils,
-        lattice, reshape2, methods, Rcpp
+        knockoff, withr, glmnet, ClusterR, FactoMineR, diceR,
+        NPBayesImputeCat, e1071, Rfast, cat, utils, ggplot2, gridExtra,
+        reshape2, methods, Rcpp
 RoxygenNote: 7.3.1
 Suggests: knitr, rmarkdown, stargazer, VIM, missMDA, clustrd,
-        clusterCrit, ggplot2, bookdown
+        clusterCrit, bookdown
 VignetteBuilder: knitr
 LazyData: true
 LinkingTo: Rcpp, RcppArmadillo
 RcppModules: IO_module
 NeedsCompilation: yes
-Packaged: 2024-05-28 12:50:03 UTC; vince
+Packaged: 2024-07-04 14:19:47 UTC; vince
 Author: Vincent Audigier [aut, cre] (CNAM MSDMA team),
   Hang Joon Kim [ctb] (University of Cincinnati)
 Maintainer: Vincent Audigier <vincent.audigier@cnam.fr>
 Repository: CRAN
-Date/Publication: 2024-05-31 13:30:18 UTC
+Date/Publication: 2024-07-04 14:40:02 UTC

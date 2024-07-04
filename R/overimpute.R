@@ -37,8 +37,7 @@
 #' nb.clust <- 3
 #' wine.na <- wine
 #' wine.na$cult <- NULL
-#' wine.na <- as.matrix(wine.na)
-#' wine.na[sample(seq(length(wine.na)), size = ceiling(length(wine.na)/3))] <- NA
+#' wine.na <- prodna(wine.na)
 #' \donttest{
 #' nnodes <- 2 # Number of CPU cores used for parallel computation
 #' 
@@ -186,17 +185,6 @@ overimpute <- function (res.imputedata, plotvars = NULL, plotinds = NULL, nnodes
                                                                              "green", heat.colors(3)[c(3, 2, 1)]), bty = "n", 
            lty = 1, horiz = TRUE, cex = 1, lwd = 0.4)
   })
-  # par(xpd=TRUE)
-  # plot(1, type = "n", axes=FALSE, xlab="", ylab="")
-  # legend("top", inset=0, legend=names(pch), pch=pch,bg=bg[1],bty = "n",cex=1.1,horiz=TRUE) 
-  
-  # legend("top", legend = c("0-0.2", "0.2-0.4", 
-                               # "0.4-0.6", "0.6-0.8", "0.8-1"), 
-         # col = c("blue", "green", heat.colors(3)[c(3, 
-                                                   # 2, 1)]),
-         # bty = "n", lty = 1, horiz = FALSE, 
-         # cex = 1, lwd = 0.4)
-  # par(xpd=FALSE)
   return(list(res.plot = res.over, res.values = res.over.value))
 }
 

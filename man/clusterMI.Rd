@@ -11,7 +11,8 @@ clusterMI(
   scaling = TRUE,
   nb.clust = NULL,
   Cboot = 50,
-  method.agnes = "average",
+  method.hclust = "average",
+  method.dist = "euclidean",
   modelNames = NULL,
   modelName.hc = "VVV",
   nstart.kmeans = 100,
@@ -32,7 +33,7 @@ clusterMI(
 \arguments{
 \item{output}{an output from the imputedata function}
 
-\item{method.clustering}{a single string specifying the clustering algorithm used ("kmeans", "pam", "clara", agnes" or "mixture","cmeans")}
+\item{method.clustering}{a single string specifying the clustering algorithm used ("kmeans", "pam", "clara", "hclust" or "mixture","cmeans")}
 
 \item{method.consensus}{a single string specifying the consensus method used to pool the contributory partitions ("NMF" or "CSPA")}
 
@@ -42,7 +43,9 @@ clusterMI(
 
 \item{Cboot}{an integer specifying the number of bootstrap replications. Default value is 50}
 
-\item{method.agnes}{character string defining the clustering method for hierarchical clustering (required only if method.clustering = "agnes")}
+\item{method.hclust}{character string defining the clustering method for hierarchical clustering (required only if method.clustering = "hclust")}
+
+\item{method.dist}{character string defining the method use for computing dissimilarity matrices in hierarchical clustering (required only if method.clustering = "hclust")}
 
 \item{modelNames}{character string indicating the models to be fitted in the EM phase of clustering (required only if method.clustering = "mixture"). By default modelNames = NULL.}
 
@@ -95,7 +98,7 @@ From a list of imputed datasets \code{clusterMI} performs cluster analysis on ea
 Step 1 can be tuned by specifying the cluster analysis method used (\code{method.clustering} argument).
 If \code{method.clustering = "kmeans"} or \code{"pam"}, then the number of clusters can be specified by tuning the \code{nb.clust} argument. By default, the same number as the one used for imputation is used.
 The number of random initializations can also be tuned through the \code{nstart.kmeans} argument.
-If \code{method.clustering = "agnes"} (hierarchical clustering), the method used can be specified (see \code{\link[cluster]{agnes}}). By default \code{"average"} is used. Furthermore, the number of clusters can be specified, but it can also be automatically chosen if \code{nb.clust} < 0.
+If \code{method.clustering = "hclust"} (hierarchical clustering), the method used can be specified (see \code{\link[stats]{hclust}}). By default \code{"average"} is used. Furthermore, the number of clusters can be specified, but it can also be automatically chosen if \code{nb.clust} < 0.
 If \code{method.clustering = "mixture"} (model-based clustering using gaussian mixture models), the model to be fitted can be tuned by modifying the \code{modelNames} argument (see \code{\link[mclust]{Mclust}}).
 If \code{method.clustering = "cmeans"} (clustering using the fuzzy c-means algorithm), then the fuzziness parameter can be modfied by tuning the\code{m.cmeans} argument. By default, \code{m.cmeans = 2}.
 
@@ -117,8 +120,7 @@ nb.clust <- 3
 m <- 5 # number of imputed data sets. Should be larger in practice
 wine.na <- wine
 wine.na$cult <- NULL
-wine.na <- as.matrix(wine.na)
-wine.na[sample(seq(length(wine.na)), size = ceiling(length(wine.na)/3))] <- NA
+wine.na <- prodna(wine.na)
 
 #imputation
 res.imp <- imputedata(data.na = wine.na, nb.clust = nb.clust, m = m)
@@ -139,5 +141,5 @@ Audigier, V. and Niang, N. (2022) Clustering with missing data: which equivalent
   T. Li, C. Ding, and M. I. Jordan (2007) Solving consensus and semi-supervised clustering problems using nonnegative matrix factorization.  In Proceedings of the 2007 Seventh IEEE International Conference on Data Mining, ICDM'07, page 577-582, USA. IEEE Computer Society. <doi:10.1109/ICDM.2007.98>
 }
 \seealso{
-\code{\link[cluster]{agnes}}, \code{\link[fpc]{nselectboot}}, \code{\link[mclust]{Mclust}}, \code{\link{imputedata}}, \code{\link[e1071]{cmeans}}
+\code{\link[stats]{hclust}}, \code{\link[fpc]{nselectboot}}, \code{\link[mclust]{Mclust}}, \code{\link{imputedata}}, \code{\link[e1071]{cmeans}}
 }

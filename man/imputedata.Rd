@@ -47,7 +47,7 @@ imputedata(
 \value{
 a list of 3 objets
  \item{res.imp}{ a list with the several imputed datasets}
- \item{res.conv}{ for FCS methods, an array given the within inertia of each imputed variable at each iteration and for each imputed dataset}
+ \item{res.conv}{ for FCS methods, an array given the between (and within) inertia of each imputed variable at each iteration and for each imputed dataset. For JM methods, a matrix given the between inertia for each variable and each imputed dataset.}
  \item{call}{ the matching call}
 }
 \description{
@@ -67,8 +67,7 @@ data(wine)
 set.seed(123456)
 wine.na <- wine
 wine.na$cult <- NULL
-wine.na <- as.matrix(wine.na)
-wine.na[sample(seq(length(wine.na)), size = ceiling(length(wine.na)/3))] <- NA
+wine.na <- prodna(wine.na)
 nb.clust <- 3 # number of clusters
 m <- 20 # number of imputed data sets
 res.imp <- imputedata(data.na = wine.na, nb.clust = nb.clust, m = m)
