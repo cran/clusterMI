@@ -498,13 +498,21 @@ imputedata<-function(data.na,
         for(tab in seq.int(m)){
           if(verbose){cat(tab,"...",sep="")}
           res.try<-try(da.mix(res.myem$s,newtheta,steps=L,prior=res.myem$theta$pi),silent = TRUE)
-          if(inherits(res.try,"try-error")){
-            newtheta<-try(da.mix(res.myem$s,newtheta,steps=L),silent=TRUE)
-            if("try-error"%in%class(newtheta)){
-              warning(paste0("Imputation using JM-GL fails to impute ",m," datasets. Try to change the seed argument or use another imputation method (i.e. FCS-homo)"))
+          if(inherits(res.try, "try-error")) {
+            newtheta <- try(da.mix(res.myem$s, newtheta, steps = L), silent = TRUE)
+            cond1 <- cond2 <- inherits(newtheta, "try-error")
+            if (!cond1) {
+              cond2 <- any(unlist(lapply(newtheta, is.nan),
+                                  any))
+            }
+            if (cond1 | cond2) {
+              warning(
+                paste0("Imputation using JM-GL fails to impute ", m," datasets. Try to change the seed argument or use another imputation method (i.e. FCS-homo)"))
               (break)()
-              }
-            }else{newtheta<-res.try}
+            }
+          }else{
+            newtheta <- res.try
+          }
           res.imp[[tab]]<-as.data.frame(imp.mix(res.myem$s,newtheta))
           #on stocke la partition
           temp.part[tab,] <- res.imp[[tab]]$class

@@ -1,4 +1,4 @@
-87f7a1195d697bbd9fcb435c11576656 *DESCRIPTION
+0c693d997e95322a2828118493201a9f *DESCRIPTION
 9260e480dac75ee061583cfd863e32c7 *NAMESPACE
 be75dc5efa64480b73531351ed0e2739 *R/2_Function_createModel_Run_new.R
 a39d388e77a3512be588e2ff95cb91a2 *R/LoadModule.R
@@ -11,7 +11,7 @@ fc0c7371e0da33e4394740e357917525 *R/calcul_inter.R
 0a649fd4a89546a208dbb94c54454755 *R/choosem.R
 38f4c7c20ed45d1e52b1560f82bd6642 *R/choosemaxit.R
 0ed827cb1b6a87621d0981871708f46d *R/choosenbclust.R
-c7ed60b9ba6f7de0d71d18a56337ead6 *R/chooser.R
+7f2841deb87a3efcfce379c6fd99d273 *R/chooser.R
 687d42d54a7ae9d01ad65d66518d6e41 *R/class2ind.R
 cf00ef54d169478d8bf200cf6fec6e76 *R/close.txtProgressBar.R
 e8539fe7dca6cec55150ba75215f8833 *R/cluster.intern.R
@@ -21,14 +21,14 @@ edfdecb213de5b766784e6e558401fcc *R/clusterMI.R
 266cd16b5f0bf4223f18dd3a962a6901 *R/drawW.R
 c7ab1db363b8cd9b6979c4600a41f992 *R/fastnmf.R
 4f41e2190738e4b56f60eb77a0ab6bfb *R/imputation.intern.R
-34f7d681def3fd6d0dd8cb783f1cf4d1 *R/imputedata.R
+0c2f4edfd6b9f5612398650c70ad5bb5 *R/imputedata.R
 0f0335b1691d47f168896b385fbe867a *R/mclustboot.intern.R
 9aff5bd468ea0480c2011cb71a761b55 *R/myem.cat.R
 67ed9d6fcb48d2caccd4889240ace530 *R/myem.mix.R
 149463c18eb7bd4a803954cc847f8f51 *R/myimp.cat.R
 c67263aca3e8b83d51c4a8cbdd7c325c *R/myimp.mix.R
 d889b6e0db277b4b8cd5727d6d958d04 *R/onefold.chooser.R
-8ff79fe12cc2cd3c8c87c14f2ef5b677 *R/overimpute.R
+c1a831e15f4d237bedec5598eef51606 *R/overimpute.R
 0723342a49ce6932b98baf3e6529e9bd *R/prodna.R
 3fd586fed00a53519453cd825abfc681 *R/randindex.R
 8f958c07ce855d46f370c7bb9cbf8d22 *R/rdirichlet.R
@@ -49,7 +49,7 @@ b7aeeb3f4474bf58e228a570613a249e *man/Silhouette.intern.Rd
 e8eff43fcb15788790d1c0575e14630e *man/choosem.Rd
 3b576caf65eac77709dad2d77dcc903c *man/choosemaxit.Rd
 e2750f786480464a5a94556d8a6cdf37 *man/choosenbclust.Rd
-b36cc65d59ca847bd53372951f91c358 *man/chooser.Rd
+83b3f162a87819ccd0016f78ef617fcb *man/chooser.Rd
 cfe54a3f50fc93cc8fa85bbde803b646 *man/cluster.intern.Rd
 eddf698a4da2496c8df853125771380c *man/clusterMI-package.Rd
 01d7cfa5b0d6201c6e6a9be188e357b9 *man/clusterMI.Rd

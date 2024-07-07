@@ -65,8 +65,8 @@
 overimpute <- function (res.imputedata, plotvars = NULL, plotinds = NULL, nnodes = 2, 
           path.outfile = NULL, alpha = 0.1, mfrow=NULL,mar=c(5, 4, 4, 2) - 1.9) 
 {
-  m.intern<-res.imputedata$call$m
-  # if (is.null(m)){m.intern<-res.imputedata$call$m}else{m.intern<-m}
+  m.intern <- sum(!sapply(res.imputedata$res.imp,is.null))
+
   if (m.intern < 100) {
     warning("The number of imputed data sets is too low to build confidence intervals according to the quantiles method. You should run imputedata with m over than 100.")
   }
@@ -113,15 +113,19 @@ overimpute <- function (res.imputedata, plotvars = NULL, plotinds = NULL, nnodes
       tmp <- as.matrix(don.over[Ind, names(which(is.plot))])
       tmp[ii] <- NA
       don.over[Ind, names(which(is.plot))] <- tmp
-      res.imp.tmp <- try(imputedata(don.over, m = 1, maxit = 1, 
-                               verbose=FALSE,
-                               method = res.imputedata$call$method,
-                               method.mice = res.imputedata$call$method.mice, 
-                               predictmat = res.imputedata$call$predictmat,nb.clust=res.imputedata$call$nb.clust,
-                               L = 2, Lstart = 1,
-                               bootstrap=res.imputedata$call$bootstrap))
+      res.imp.tmp <- try(imputedata(don.over,
+                                    m = 1,
+                                    maxit = 1, 
+                                    verbose=FALSE,
+                                    method = res.imputedata$call$method,
+                                    method.mice = res.imputedata$call$method.mice, 
+                                    predictmat = res.imputedata$call$predictmat,
+                                    nb.clust=res.imputedata$call$nb.clust,
+                                    L = 2,
+                                    Lstart = 1,
+                                    bootstrap=res.imputedata$call$bootstrap))
       
-      if ("try-error"%in%class(res.imp.tmp)) {
+      if (inherits(res.imp.tmp,"try-error")) {
         warning(res.imp.tmp)
         res <- NA
       }

@@ -57,14 +57,18 @@
 #'                          listvar = listvar,
 #'                          B = B,
 #'                          nnodes = nnodes)
-#'                          
+#'
+#' # frequency of selection
+#' propselect <- res.varsel$proportion[listvar, ]
+#'
 #' #predictormatrix with the default threshold value                         
 #' predictmat <- res.varsel$predictormatrix
 #' 
 #' # r optimal and associated predictor matrix 
 #' res.chooser <- chooser(res.varsel = res.varsel)
 #' thresh <- res.chooser[[listvar]]$r
-#' predictmat[listvar,res.varsel$proportion[listvar,]<thresh]<-0
+#' is.selected <- propselect>=thresh
+#' predictmat[listvar, names(is.selected)] <- as.numeric(is.selected)
 #'
 #' 
 #' # imputation
