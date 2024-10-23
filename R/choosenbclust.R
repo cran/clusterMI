@@ -183,12 +183,7 @@ choosenbclust<-function (output, grid = 2:5, graph = TRUE, verbose = TRUE,
                                      nnodes = 1,
                                      instability = TRUE,
                                      verbose = FALSE,
-                                     nmf.threshold = output$call$nmf.threshold,
-                                     nmf.nstart = output$call$nmf.nstart,
-                                     nmf.early_stop_iter = output$call$nmf.early_stop_iter,
-                                     nmf.initializer = output$call$nmf.initializer,
-                                     nmf.batch_size = output$call$nmf.batch_size,
-                                     nmf.iter.max = output$call$nmf.iter.max
+                                     parameter.nmf = output$call$parameter.nmf
                                      )
     parallel::stopCluster(cl)
   }
@@ -210,12 +205,7 @@ choosenbclust<-function (output, grid = 2:5, graph = TRUE, verbose = TRUE,
                         nnodes = output$call$nnodes,
                         instability = TRUE,
                         verbose = FALSE,
-                        nmf.threshold = output$call$nmf.threshold,
-                        nmf.nstart = output$call$nmf.nstart,
-                        nmf.early_stop_iter = output$call$nmf.early_stop_iter,
-                        nmf.initializer = output$call$nmf.initializer,
-                        nmf.batch_size = output$call$nmf.batch_size,
-                        nmf.iter.max = output$call$nmf.iter.max)
+                        parameter.nmf=output$call$parameter.nmf)
   }
   if (verbose) {
     cat(" done!\n")

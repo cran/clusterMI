@@ -14,7 +14,7 @@
 #' @param res.imputedata an output from the imputedata function
 #' @param plotvars column index of the variables overimputed
 #' @param plotinds row index of the individuals overimputed
-#' @param nnodes an integer indicating the number of nodes for parallel calculation. Default value is 5
+#' @param nnodes an integer indicating the number of nodes for parallel calculation. Default value is 2
 #' @param path.outfile a vector of strings indicating the path for redirection of print messages. Default value is NULL, meaning that silent imputation is performed. Otherwise, print messages are saved in the files path.outfile/output.txt. One file per node is generated.
 #' @param alpha	alpha level for prediction intervals
 #' @param mfrow a vector of the form c(nr, nc)

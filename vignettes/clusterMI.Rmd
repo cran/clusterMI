@@ -208,6 +208,7 @@ res.imp <- imputedata(data.na = wine.na,
 choosemaxit(res.imp)
 ```
 
+For computational reasons,  convergence diagnostic can be achieved by decreasing the number of imputed datasets `m`. When the number of iterations `maxit` will be chosen, then multiple imputation with a larger value for `m` could be considered.
 
 ### Specifying imputation models
 
@@ -706,7 +707,8 @@ res.ana.rkm <- lapply(res.imp.JM$res.imp,
 res.ana.rkm <- lapply(res.ana.rkm, "[[", "cluster")
 
 # pooling by NMF
-res.pool.rkm <- fastnmf(res.ana.rkm, nb.clust = nb.clust)$clust
+res.pool.rkm <- fastnmf(res.ana.rkm, nb.clust = nb.clust)
+part.rkm <- res.pool.rkm$best$clust# extract the best solution based on several initialisations
 ```
 
 Note that in this case, the instability is not computed.

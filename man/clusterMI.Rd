@@ -22,12 +22,12 @@ clusterMI(
   nnodes = 1,
   instability = TRUE,
   verbose = TRUE,
-  nmf.threshold = 10^(-5),
-  nmf.nstart = 100,
-  nmf.early_stop_iter = 10,
-  nmf.initializer = "random",
-  nmf.batch_size = NULL,
-  nmf.iter.max = 50
+  parameter.nmf = list(method.init = c("BOK", "kmeans"), threshold = 10^(-5), printflag =
+    FALSE, parameter.kmeans = list(nstart = 100, iter.max = 50, algorithm =
+    c("Hartigan-Wong", "Lloyd", "Forgy", "MacQueen"), trace = FALSE),
+    parameter.minibatchkmeans = list(batch_size = 10, num_init = 1, max_iters = 50,
+    init_fraction = 1, initializer = "kmeans++", early_stop_iter = 10, verbose = FALSE,
+    CENTROIDS = NULL, tol = 1e-04, tol_optimal_init = 0.3, seed = 1))
 )
 }
 \arguments{
@@ -65,17 +65,7 @@ clusterMI(
 
 \item{verbose}{a boolean. If TRUE, a message is printed at each step. Default value is TRUE}
 
-\item{nmf.threshold}{Default value is 10^(-5),}
-
-\item{nmf.nstart}{Default value is 100,}
-
-\item{nmf.early_stop_iter}{Default value is 10,}
-
-\item{nmf.initializer}{Default value is 'random',}
-
-\item{nmf.batch_size}{Default value is 20,}
-
-\item{nmf.iter.max}{Default value is 50}
+\item{parameter.nmf}{a list of arguments for consensus by NMF. See the fastnmf help page.}
 }
 \value{
 A list with three objects

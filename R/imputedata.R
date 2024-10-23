@@ -106,8 +106,19 @@ imputedata<-function(data.na,
   data.type=data.type,
   bootstrap=bootstrap)
   
-  if(is.null(method.mice)){method.mice.homo<-NULL;method.mice.hetero<-"2l.jomo"}else{
-  if("FCS-homo"%in%method){method.mice.homo<-method.mice}else if("FCS-hetero"%in%method){method.mice.hetero<-method.mice}}
+  if(is.null(method.mice)){
+    method.mice.homo<-NULL;method.mice.hetero<-"2l.jomo"
+  }else{
+    if(length(method.mice)==1){
+      method.mice.hetero<- method.mice.homo<-method.mice
+    }else{
+      if("FCS-homo"%in%method){
+        method.mice.homo<-c("",method.mice)
+      }else if("FCS-hetero"%in%method){
+        method.mice.hetero<-c("",method.mice)}
+    }
+  }
+
   # if("FCS-homo"%in%method){bootstrap<-TRUE}else if("FCS-hetero"%in%method){bootstrap<-FALSE}
   # bootstrap<-FALSE
   res.conv<-NULL
@@ -507,9 +518,14 @@ imputedata<-function(data.na,
             }
             if (cond1 | cond2) {
               warning(
-                paste0("Imputation using JM-GL fails to impute ", m," datasets. Try to change the seed argument or use another imputation method (i.e. FCS-homo)"))
+                paste0("Imputation using JM-GL fails to impute ", m," datasets. Try to change the seed argument or use another imputation method (e.g. FCS-homo)"))
               (break)()
             }
+          }else if(any(unlist(lapply(res.try, is.nan),
+                              any))){
+            warning(
+              paste0("Imputation using JM-GL fails to impute ", m," datasets. Try to change the seed argument or use another imputation method (e.g. FCS-homo)"))
+            (break)()
           }else{
             newtheta <- res.try
           }

@@ -558,7 +558,8 @@ res.pool.kmeans$instability # look at instabilitiy measures
 #  res.ana.rkm <- lapply(res.ana.rkm, "[[", "cluster")
 #  
 #  # pooling by NMF
-#  res.pool.rkm <- fastnmf(res.ana.rkm, nb.clust = nb.clust)$clust
+#  res.pool.rkm <- fastnmf(res.ana.rkm, nb.clust = nb.clust)
+#  part.rkm <- res.pool.rkm$best$clust# extract the best solution based on several initialisations
 
 ## ----overimpecho, eval=FALSE--------------------------------------------------
 #  # Multiple imputation is rerun with more imputed data sets (m = 100)

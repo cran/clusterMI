@@ -7,13 +7,14 @@
 fastnmf(
   listpart,
   nb.clust,
+  method.init = c("BOK", "kmeans"),
   threshold = 10^(-5),
   printflag = TRUE,
-  nstart = 100,
-  early_stop_iter = 10,
-  initializer = "random",
-  batch_size = NULL,
-  iter.max = 50
+  parameter.kmeans = list(nstart = 100, iter.max = 50, algorithm = c("Hartigan-Wong",
+    "Lloyd", "Forgy", "MacQueen"), trace = FALSE),
+  parameter.minibatchkmeans = list(batch_size = 10, num_init = 1, max_iters = 50,
+    init_fraction = 1, initializer = "kmeans++", early_stop_iter = 10, verbose = FALSE,
+    CENTROIDS = NULL, tol = 1e-04, tol_optimal_init = 0.3, seed = 1)
 )
 }
 \arguments{
@@ -21,33 +22,30 @@ fastnmf(
 
 \item{nb.clust}{an integer specifying the number of clusters}
 
+\item{method.init}{a vector giving initialisation methods used among "BOK", "kmeans", "minibatchkmeans" "sample". See details.}
+
 \item{threshold}{a real specifying when the NMF algorithm is stoped. Default value is 10^(-5)}
 
 \item{printflag}{a boolean. If TRUE, nmf will print messages on console. Default value is TRUE}
 
-\item{nstart}{how many random sets should be chosen for kmeans initalization. Default value is 100}
+\item{parameter.kmeans}{a list of arguments for kmeans function. See keans help page.}
 
-\item{early_stop_iter}{continue that many iterations after calculation of the best within-cluster-sum-of-squared-error. Default value is 10. See MiniBatchKmeans help page.}
-
-\item{initializer}{the method of initialization. One of, optimal_init, quantile_init, kmeans++ and random. See MiniBatchKmeans help page.}
-
-\item{batch_size}{the size of the mini batches for kmeans clustering. Default value is NULL.}
-
-\item{iter.max}{the maximum number of iterations allowed for kmeans. Default value is 50}
+\item{parameter.minibatchkmeans}{list of arguments for MiniBatchKmeans function. See MiniBatchKmeans help page.}
 }
 \value{
-a list of 5 objets
+For each initialisation method, a list of 5 objets is returned
  \item{Htilde}{A fuzzy disjunctive table}
  \item{S}{A positive matrix}
  \item{Mtilde}{The average of connectivity matrices}
  \item{crit}{A vector with the optimized criterion at each iteration}
  \item{cluster}{the consensus partition in nb.clust classes}
+ In addition, the best initialisation method is returned
 }
 \description{
 From a list of partitions \code{fastnmf} pools partition as proposed in Li and Ding (2007) <doi:10.1109/ICDM.2007.98>.
 }
 \details{
-fastnmf performs consensus clustering using non-negative matrix factorization following Li and Ding (2007) <doi:10.1109/ICDM.2007.98>. The set of partitions that are aggregated needs to be given as a list where each element is a vector of numeric values. Note that the number of classes for each partition can vary. The number of classes for the consensus partition should be given using the nb.clust argument. The NMF algorithm is iterative and required an initial partition. This latter is based on kmeans clustering on the average of connectivity matrices. If batchsize is NULL, then kmeans clustering is performed using \code{nstart} initial values and \code{iter.max} iterations. Otherwise, Mini Batch Kmeans is used. This algorithm could be faster than kmeans if the number of invididuals is large.
+fastnmf performs consensus clustering using non-negative matrix factorization following Li and Ding (2007) <doi:10.1109/ICDM.2007.98>. The set of partitions that are aggregated needs to be given as a list where each element is a vector of numeric values. Note that the number of classes for each partition can vary. The number of classes for the consensus partition should be given using the \code{nb.clust} argument. The NMF algorithm is iterative and required an initial partition. This latter is specified by \code{method.init}. \code{method.init="BOK"} means the partition considered is a partition from \code{listpart} which minimizes the NMF criterion. Alternative methods are "kmeans", "minibathckmeans" or "sample". If \code{method.init} = "kmeans" (or "minibatchkmeans"), then clustering on the average of connectivity matrices is performed by kmeans (or "minibatchkmeans"). Mini Batch Kmeans could be faster than kmeans if the number of invididuals is large. If \code{method.init} = "sample", then a random partition is drawn. If \code{method.init} is a vector of several characters, then several initialization methods are considered and the best method is returned. By default, \code{method.init= c("BOK", "kmeans")}.
 }
 \examples{
 data(wine)
@@ -75,7 +73,9 @@ res.ana.rkm <- lapply(res.imp$res.imp,
 res.ana.rkm <-lapply(res.ana.rkm,"[[","cluster")
 
 # pooling by NMF
-res.pool.rkm <- fastnmf(res.ana.rkm, nb.clust = nb.clust)$clust
+res.pool.rkm <- fastnmf(res.ana.rkm, nb.clust = nb.clust)
+## extract the partition corresponding to the best initialisation
+part <- res.pool.rkm$best$clust
 
 }
 \references{

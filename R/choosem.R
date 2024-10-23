@@ -56,12 +56,11 @@ choosem <- function(output,graph=TRUE,nnodes = 1){
                                   
                                   res.out<-fastnmf(output$call$res.analyse[seq.int(m)],
                                                    nb.clust =output$call$output$call$nb.clust,
-                                                   threshold = output$call$nmf.threshold,nstart = output$call$nmf.nstart,
-                                                   early_stop_iter = output$call$nmf.early_stop_iter,
-                                                   initializer = output$call$nmf.initializer,
-                                                   batch_size = output$call$nmf.batch_size,
-                                                   iter.max = output$call$nmf.iter.max,
-                                                   printflag = FALSE)$clust
+                                                   threshold = output$call$parameter.nmf$threshold,
+                                                   method.init = output$call$parameter.nmf$method.init,
+                                                   parameter.kmeans = output$call$parameter.nmf$parameter.kmeans,
+                                                   parameter.minibatchkmeans = output$call$parameter.nmf$parameter.minibatchkmeans,
+                                                   printflag = FALSE)$best$clust
                                   
                                   return(res.out)
                                 },output=output)
@@ -72,10 +71,12 @@ choosem <- function(output,graph=TRUE,nnodes = 1){
     part<-sapply(seq(1,output$call$output$call$m,1),FUN=function(m,output){
       res.out<-fastnmf(output$call$res.analyse[seq.int(m)],
                        nb.clust =output$call$output$call$nb.clust,
-                       threshold = output$call$nmf.threshold,nstart = output$call$nmf.nstart,
-                       early_stop_iter = output$call$nmf.early_stop_iter,
-                       initializer = output$call$nmf.initializer,
-                       batch_size = output$call$nmf.batch_size,iter.max = output$call$nmf.iter.max,printflag = FALSE)$clust
+                       method.init = output$call$parameter.nmf$method.init,
+                       threshold = output$call$parameter.nmf$threshold,
+                       parameter.kmeans = output$call$parameter.nmf$parameter.kmeans,
+                       parameter.minibatchkmeans = output$call$parameter.nmf$parameter.minibatchkmeans,
+                       printflag = FALSE
+                       )$best$clust
       
       return(res.out)
     },output=output)

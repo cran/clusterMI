@@ -41,12 +41,7 @@
 #' @param nnodes number of CPU cores for parallel computing. By default, nnodes = 1
 #' @param instability a boolean indicating if cluster instability must be computed. Default value is TRUE
 #' @param verbose a boolean. If TRUE, a message is printed at each step. Default value is TRUE
-#' @param nmf.threshold Default value is 10^(-5),
-#' @param nmf.nstart Default value is 100,
-#' @param nmf.early_stop_iter Default value is 10,
-#' @param nmf.initializer Default value is 'random',
-#' @param nmf.batch_size Default value is 20,
-#' @param nmf.iter.max Default value is 50
+#' @param parameter.nmf a list of arguments for consensus by NMF. See the fastnmf help page.
 #' @return A list with three objects
 #' \item{part}{the consensus partition}
 #' \item{instability}{a list of four objects: \code{U} the within instability measure for each imputed data set, \code{Ubar} the associated average, \code{B} the between instability measure, \code{Tot} the total instability measure}
@@ -103,12 +98,26 @@ clusterMI<-function(output,
                   nnodes = 1,
                   instability = TRUE,
                   verbose = TRUE,
-                  nmf.threshold=10^(-5),
-                  nmf.nstart=100,
-                  nmf.early_stop_iter=10,
-                  nmf.initializer = 'random',
-                  nmf.batch_size = NULL,
-                  nmf.iter.max=50){
+                  parameter.nmf = list(method.init=c("BOK","kmeans"),
+                                       threshold=10^(-5),
+                                       printflag=FALSE,
+                                       parameter.kmeans=list(nstart=100,
+                                                             iter.max=50,
+                                                             algorithm = c("Hartigan-Wong", "Lloyd", "Forgy",
+                                                                           "MacQueen"),
+                                                             trace = FALSE),
+                                       parameter.minibatchkmeans=list(batch_size = 10,
+                                                                      num_init = 1,
+                                                                      max_iters = 50, 
+                                                                      init_fraction = 1,
+                                                                      initializer = "kmeans++",
+                                                                      early_stop_iter = 10, 
+                                                                      verbose = FALSE,
+                                                                      CENTROIDS = NULL,
+                                                                      tol = 1e-04,
+                                                                      tol_optimal_init = 0.3, 
+                                                                      seed = 1))
+                  ){
   
   res.imp<-output$res.imp
   if(any(sapply(lapply(res.imp,is.na),sum)>0)){
@@ -137,12 +146,7 @@ clusterMI<-function(output,
                             m.cmeans = m.cmeans,
                             nnodes=nnodes,
                             instability=instability,
-                            nmf.threshold=nmf.threshold,
-                            nmf.nstart=nmf.nstart,
-                            nmf.early_stop_iter = nmf.early_stop_iter,
-                            nmf.initializer =  nmf.initializer,
-                            nmf.batch_size = nmf.batch_size,
-                            nmf.iter.max = nmf.iter.max
+                            parameter.nmf=parameter.nmf
                             ))
     return(res.out)
   }
@@ -211,15 +215,14 @@ clusterMI<-function(output,
     res.pool<-CSPA(res.pool,k=nb.clust.intern)
   }else if(method.consensus=="NMF"){
     # print(k);print(summary(res.clust.part))
-    res.pool<-fastnmf(res.clust.part.list,
+    res.pool<-fastnmf(listpart = res.clust.part.list,
                       nb.clust=nb.clust.intern,
-                      printflag = FALSE,
-                      threshold=nmf.threshold,
-                      nstart=nmf.nstart,
-                      early_stop_iter=nmf.early_stop_iter,
-                      initializer = nmf.initializer,
-                      batch_size = nmf.batch_size,
-                      iter.max=nmf.iter.max)$clust
+                      method.init = parameter.nmf$method.init,
+                      threshold = parameter.nmf$threshold,
+                      printflag = parameter.nmf$printflag,
+                      parameter.kmeans=parameter.nmf$parameter.kmeans,
+                      parameter.minibatchkmeans=parameter.nmf$parameter.minibatchkmeans
+                      )$best$clust
     
     
   }else{stop("consensus method unknown")}
@@ -299,12 +302,7 @@ clusterMI<-function(output,
                             nnodes=nnodes,
                             instability=instability,
                             m.cmeans=m.cmeans,
-                            nmf.threshold= nmf.threshold,
-                            nmf.nstart=nmf.nstart,
-                            nmf.early_stop_iter=nmf.early_stop_iter,
-                            nmf.initializer = nmf.initializer,
-                            nmf.batch_size = nmf.batch_size,
-                            nmf.iter.max=nmf.iter.max,
+                            parameter.nmf=parameter.nmf,
                             res.analyse = res.clust.part.list))
   }else{
     res.out<-list(part=res.pool,
@@ -324,12 +322,7 @@ clusterMI<-function(output,
                             nnodes=nnodes,
                             instability=instability,
                             m.cmeans=m.cmeans,
-                            nmf.threshold= nmf.threshold,
-                            nmf.nstart=nmf.nstart,
-                            nmf.early_stop_iter=nmf.early_stop_iter,
-                            nmf.initializer = nmf.initializer,
-                            nmf.batch_size = nmf.batch_size,
-                            nmf.iter.max=nmf.iter.max,
+                            parameter.nmf=parameter.nmf,
                             res.analyse = res.clust.part.list))
   }
   return(res.out)
