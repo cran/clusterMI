@@ -44,7 +44,7 @@ A list of two matrices
 This function imputes each observed value from each conditional imputation model obtained from the imputedata function. The comparison between the "overimputed" values and the observed values is made by building a confidence interval for each observed value using the quantiles of the overimputed values (see Blackwell et al. (2015) <doi:10.1177/0049124115585360>). Note that confidence intervals built with quantiles require a large number of imputations. If the model fits well the data, then the 90\% confidence interval should contain the observed value in 90\% of the cases. The function overimpute takes as an input an output of the \code{\link{imputedata}} function (\code{res.imputedata} argument), the indices of the incomplete continuous variables that are plotted (\code{plotvars}), the indices of individuals (can be useful for time consuming imputation methods), the number of CPU cores for parallel computation, and the path for exporting print message generated during the parallel process (\code{path.outfile}).
 }
 \examples{
-data(wine)
+data(wine, package = "clusterMI")
 
 require(parallel)
 set.seed(123456)

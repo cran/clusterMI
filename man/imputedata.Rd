@@ -63,7 +63,7 @@ The \code{mice} package proposes various methods for imputation which can be spe
 Note that two other joint modelling methods are also available: \code{JM-GL} from the R package \code{mix} and \code{JM-DP} from the R package \code{DPImputeCont} \url{https://github.com/hang-j-kim/DPImputeCont}
 }
 \examples{
-data(wine)
+data(wine, package = "clusterMI")
 set.seed(123456)
 wine.na <- wine
 wine.na$cult <- NULL

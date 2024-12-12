@@ -35,7 +35,12 @@ calculintra.intern<-function(res.imp,
                          classification="centroid",krange=nb.clust,usepam=(method.clustering=="pam"))$stabk[nb.clust]
   }
   if(method.clustering=="mixture"){
-    methodclassif<-ifelse(test=modelNames%in%c("EEE","EEI","EII"),yes = "lda",no="qda")
+    if(is.null(modelNames)){
+      methodclassif<- "qda"
+    }else{
+      methodclassif<-ifelse(test=modelNames%in%c("EEE","EEI","EII"),yes = "lda",no="qda")
+    }
+    
     res.out<-nselectboot(data=res.imp.intern,B=Cboot,clustermethod=noisemclustCBI,
                          classification=methodclassif,krange=nb.clust,multipleboot=FALSE,modelNames=modelNames,verbose = FALSE)$stabk[nb.clust]
   }

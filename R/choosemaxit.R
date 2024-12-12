@@ -18,7 +18,7 @@
 #' @importFrom reshape2 melt
 #' @importFrom gridExtra arrangeGrob
 #' @examples
-#' data(wine)
+#' data(wine, package = "clusterMI")
 #' set.seed(123456)
 #' wine.na <- wine
 #' wine.na$cult <- NULL

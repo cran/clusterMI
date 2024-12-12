@@ -28,7 +28,7 @@
 #' @references 
 #'  Audigier, V. and Niang, N., Clustering with missing data: which equivalent for Rubin's rules? Advances in Data Analysis and Classification <doi:10.1007/s11634-022-00519-1>, 2022.
 #' @examples
-#' data(wine)
+#' data(wine, package = "clusterMI")
 #' 
 #' require(parallel)
 #' set.seed(123456)
@@ -129,84 +129,35 @@ choosenbclust<-function (output, grid = 2:5, graph = TRUE, verbose = TRUE,
         ") and pooling (by ", output$call$method.consensus, 
         ") ...", sep = "")
   }
-  if (nnodes.intern > 1) {
-    cl <- parallel::makeCluster(nnodes.intern, type = "PSOCK")
-    parallel::clusterExport(cl, list("output",
-                                     "res.imp",
-                                     #fonctions requises par calculintra (fpc)
-                                     "kmeansCBI",
-                                     "nselectboot", 
-                                     "claraCBI",
-                                     "noisemclustCBI",
-                                     "hclustCBI",
-                                     "cmeansCBI.intern",
-                                     #fonctions appellees par clusterMI
-                                     "fastnmf",
-                                     "calculintra.intern",
-                                     "cluster.intern",
-                                     "clusterMI",
-                                     "calcul_inter",
-                                     "randindex",
-                                     "CSPA",
-                                     #fonctions appelees par cluster.intern
-                                     "Silhouette.intern",
-                                     "cmeans",
-                                     "kmeans",
-                                     "hclust",
-                                     "cutree",
-                                     "setTxtProgressBar", 
-                                     "txtProgressBar",
-                                     "with_seed",
-                                     "Mclust",
-                                     "hc",
-                                     "hcEEE",
-                                     "hcVVV", 
-                                     "hcVII",
-                                     "hcEII",
-                                     #factominer
-                                     "PCA",
-                                     "MCA",
-                                     "FAMD"), envir = environment())
-    res.rubin <- parallel::parLapply(cl, res.imp, fun = clusterMI,
-                                     method.clustering = output$call$method.clustering, 
-                                     method.consensus = output$call$method.consensus, 
-                                     scaling = output$call$scaling,
-                                     nb.clust = output$call$nb.clust.intern, 
-                                     Cboot = output$call$Cboot,
-                                     method.hclust = output$call$method.hclust,
-                                     method.dist =  output$call$method.dist,
-                                     modelNames = output$call$modelNames,
-                                     modelName.hc=output$call$modelName.hc,
-                                     nstart.kmeans = output$call$nstart.kmeans, 
-                                     iter.max.kmeans = output$call$iter.max.kmeans,
-                                     m.cmeans = output$call$m.cmeans,
-                                     nnodes = 1,
-                                     instability = TRUE,
-                                     verbose = FALSE,
-                                     parameter.nmf = output$call$parameter.nmf
-                                     )
-    parallel::stopCluster(cl)
-  }
-  else {
-    res.rubin <- lapply(res.imp,
-                        FUN = clusterMI,
-                        method.clustering = output$call$method.clustering, 
-                        method.consensus = output$call$method.consensus, 
-                        scaling = output$call$scaling,
-                        nb.clust = output$call$nb.clust.intern,
-                        Cboot = output$call$Cboot,
-                        method.hclust = output$call$method.hclust,
-                        method.dist =  output$call$method.dist,
-                        modelNames = output$call$modelNames,
-                        modelName.hc=output$call$modelName.hc,
-                        nstart.kmeans = output$call$nstart.kmeans, 
-                        iter.max.kmeans = output$call$iter.max.kmeans,
-                        m.cmeans = output$call$m.cmeans,
-                        nnodes = output$call$nnodes,
-                        instability = TRUE,
-                        verbose = FALSE,
-                        parameter.nmf=output$call$parameter.nmf)
-  }
+
+    res.rubin <- mapply(FUN = function(res.imp,nb.clust,call.clusterMI,nnodes){
+      #limitation du temps de calcul de NMF car inutile
+      parameter.nmf<- call.clusterMI$parameter.nmf
+      parameter.nmf[["threshold"]] <- Inf
+      res.out <- clusterMI(res.imp,
+                           method.clustering = call.clusterMI$method.clustering,
+                           method.consensus = call.clusterMI$method.consensus, 
+                           scaling = call.clusterMI$scaling,
+                           nb.clust = c("ana"=ifelse(call.clusterMI$nb.clust["ana"]<0,
+                                                     call.clusterMI$nb.clust["ana"],
+                                                     nb.clust),
+                                        "nmf"=nb.clust),
+                           Cboot = call.clusterMI$Cboot,
+                           method.hclust = call.clusterMI$method.hclust,
+                           method.dist =  call.clusterMI$method.dist,
+                           modelNames = call.clusterMI$modelNames,
+                           modelName.hc=call.clusterMI$modelName.hc,
+                           nstart.kmeans = call.clusterMI$nstart.kmeans, 
+                           iter.max.kmeans = call.clusterMI$iter.max.kmeans,
+                           m.cmeans = call.clusterMI$m.cmeans,
+                           nnodes = nnodes,
+                           instability = TRUE,
+                           verbose = FALSE,
+                           parameter.nmf=parameter.nmf
+      )
+      return(res.out)
+    }, res.imp = res.imp , nb.clust = grid, MoreArgs =  list("call.clusterMI" = output$call,"nnodes"=nnodes.intern),SIMPLIFY = FALSE)
+  
   if (verbose) {
     cat(" done!\n")
   }

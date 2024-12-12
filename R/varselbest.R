@@ -36,7 +36,7 @@
 #' @references 
 #'  Bar-Hen, A. and Audigier, V., An ensemble learning method for variable selection: application to high dimensional data and missing values, Journal of Statistical Computation and Simulation, <doi:10.1080/00949655.2022.2070621>, 2022.
 #' @examples
-#' data(wine)
+#' data(wine, package = "clusterMI")
 #' 
 #' require(parallel)
 #' set.seed(123456)

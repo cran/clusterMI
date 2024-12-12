@@ -20,7 +20,7 @@
 #' In addition, it allows pooling results both in terms of partition and instability, as proposed in Audigier and Niang (2022) <doi:10.1007/s11634-022-00519-1>. Among applications, this instability measure can be used to choose a number of clusters with missing values.
 #' @name clusterMI-package
 #' @examples
-#' data(wine)
+#' data(wine, package = "clusterMI")
 #' 
 #' require(parallel)
 #' set.seed(123456)

@@ -49,7 +49,7 @@ By resampling \code{B} times, a sample of size \code{sizeblock} among the p vari
 The number of iterations \code{B} should be large so that the proportion of times a variable is selected becomes stable. \code{chooseB} plots the values of proportion according to the number of iterations.
 }
 \examples{
-data(wine)
+data(wine, package = "clusterMI")
 
 require(parallel)
 ref <- wine$cult

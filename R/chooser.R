@@ -35,7 +35,7 @@
 #'  Schafer, J. L. (1997) Analysis of Incomplete Multivariate Data. Chapman & Hall, Chapter 9.
 #' 
 #' @examples
-#' data(wine)
+#' data(wine, package = "clusterMI")
 #' 
 #' require(parallel)
 #' set.seed(123456)
@@ -93,6 +93,7 @@ chooser<-function(res.varsel,#resultat varselbest
                   nbvarused=NULL,
                   path.outfile=NULL){
   data.na <- res.varsel$call$data.na
+  if(is.null(data.na)){data.na <- res.varsel$call$res.imputedata$call$data.na}
   if(is.null(seed)){stop("a numeric value is expected for seed argument")}
   set.seed(seed)
   rngseed(seed)

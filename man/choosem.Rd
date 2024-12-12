@@ -33,7 +33,7 @@ then it means last imputed dataset does not modify the consensus partition.
 Consequently, the number of imputed datasets can be considered as sufficiently large.
 }
 \examples{
-data(wine)
+data(wine, package = "clusterMI")
 
 set.seed(123456)
 ref <- wine$cult

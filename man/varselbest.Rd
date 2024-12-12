@@ -72,7 +72,7 @@ By resampling \code{B} times, a sample of size \code{sizeblock} among the p vari
 We need to define a threshold (\code{r}) to conclude if a given variable is significantly related to the response.
 }
 \examples{
-data(wine)
+data(wine, package = "clusterMI")
 
 require(parallel)
 set.seed(123456)

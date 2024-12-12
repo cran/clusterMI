@@ -39,7 +39,7 @@ clusterMI(
 
 \item{scaling}{boolean. If TRUE, variables are scaled. Default value is TRUE}
 
-\item{nb.clust}{an integer specifying the number of clusters}
+\item{nb.clust}{an integer specifying the number of clusters. If two distinct values are considered for analysis and pooling steps, then a 2 length vector can be provided to specify the two numbers respectively.}
 
 \item{Cboot}{an integer specifying the number of bootstrap replications. Default value is 50}
 
@@ -101,7 +101,7 @@ Step 4 averages the previous instability measures given a within instability (\c
 All steps can be performed in parallel by specifying the number of CPU cores (\code{nnodes} argument). Steps 3 and 4 are more time consuming. To compute only steps 1 and 2 use \code{instability = FALSE}.
 }
 \examples{
-data(wine)
+data(wine, package = "clusterMI")
 
 require(parallel)
 set.seed(123456)

@@ -29,7 +29,7 @@ a list of two objects
 The \code{choosenbclust} function browses a grid of values for the number of clusters and for each one imputes the data and computes the instability.
 }
 \examples{
-data(wine)
+data(wine, package = "clusterMI")
 
 require(parallel)
 set.seed(123456)

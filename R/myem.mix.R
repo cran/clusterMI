@@ -41,7 +41,9 @@ myem.mix<-function (dataset, K, boot = FALSE, silent = TRUE, nbquali = 0,
   }
   if (cond1) {
     res.mclust <- Mclust(na.omit(dataset[, quanti.index, 
-                                         drop = FALSE]), G = K * nbmod, modelNames = "EEI", 
+                                         drop = FALSE]),
+                         G = K * nbmod,
+                         modelNames = "EEI", 
                          verbose = FALSE)
     #transformation de la sortie de mclust pour s'insérer dans em.mix (réciproque de getparam.mix)
     start <- vector("list", length = 3)

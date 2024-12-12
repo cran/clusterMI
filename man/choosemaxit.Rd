@@ -45,7 +45,7 @@ No return value
 The \code{choosemaxit} function plots the within and between variance for each variable (specified in \code{plotvars}) against the iteration number for each of the replications (specified in \code{plotm}).
 }
 \examples{
-data(wine)
+data(wine, package = "clusterMI")
 set.seed(123456)
 wine.na <- wine
 wine.na$cult <- NULL

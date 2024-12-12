@@ -23,7 +23,7 @@
 #' @references
 #'  Audigier, V. and Niang, N., Clustering with missing data: which equivalent for Rubin's rules? Advances in Data Analysis and Classification <doi:10.1007/s11634-022-00519-1>, 2022.
 #' @examples
-#' data(wine)
+#' data(wine, package = "clusterMI")
 #' 
 #' set.seed(123456)
 #' ref <- wine$cult

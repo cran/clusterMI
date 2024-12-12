@@ -28,7 +28,7 @@
 #' @param method.clustering a single string specifying the clustering algorithm used ("kmeans", "pam", "clara", "hclust" or "mixture","cmeans")
 #' @param method.consensus a single string specifying the consensus method used to pool the contributory partitions ("NMF" or "CSPA")
 #' @param scaling boolean. If TRUE, variables are scaled. Default value is TRUE
-#' @param nb.clust an integer specifying the number of clusters
+#' @param nb.clust an integer specifying the number of clusters. If two distinct values are considered for analysis and pooling steps, then a 2 length vector can be provided to specify the two numbers respectively.
 #' @param Cboot an integer specifying the number of bootstrap replications. Default value is 50
 #' @param method.hclust character string defining the clustering method for hierarchical clustering (required only if method.clustering = "hclust")
 #' @param method.dist character string defining the method use for computing dissimilarity matrices in hierarchical clustering (required only if method.clustering = "hclust")
@@ -59,7 +59,7 @@
 #' @importFrom diceR CSPA
 #' @importFrom fpc kmeansCBI nselectboot claraCBI noisemclustCBI hclustCBI
 #' @examples
-#' data(wine)
+#' data(wine, package = "clusterMI")
 #' 
 #' require(parallel)
 #' set.seed(123456)
@@ -127,7 +127,20 @@ clusterMI<-function(output,
       xx.out<-xx[,is.complete,drop=FALSE]
       return(xx.out)})
     }
-  if(is.null(nb.clust)){nb.clust.intern<-output$call$nb.clust}else{nb.clust.intern<-nb.clust}
+  if(is.null(nb.clust)){
+    nb.clust.ana<-nb.clust.nmf<-output$call$nb.clust
+  }else if (!is.null(nb.clust)){
+    if(length(nb.clust)==1){
+      nb.clust.ana<-nb.clust.nmf<-nb.clust
+    }else if(length(nb.clust)==2){
+      nb.clust.ana<-nb.clust[1]
+      nb.clust.nmf<-nb.clust[2]
+        }
+  }
+  
+  if(("BOK"%in%parameter.nmf$method.init)&(nb.clust.ana != nb.clust.nmf)){
+    stop("BOK initialisation method cannot be used if the number of clusters varies between the analysis and pooling steps. The argument parameter.nmf should be accordingly modified.")
+    }
   if(any(sapply(res.imp,FUN=nrow)<=15)|("try-error"%in%class(res.imp))){
     res.out<-list(part=NA,
                   instability=list(Ubar=NA,U=NA,B=NA),
@@ -135,7 +148,7 @@ clusterMI<-function(output,
                             method.consensus=method.consensus,
                             method.clustering=method.clustering,
                             scaling=scaling,
-                            nb.clust=nb.clust,
+                            nb.clust=c("ana"=nb.clust.ana,"nmf"=nb.clust.nmf),
                             Cboot=Cboot,
                             method.hclust=method.hclust,
                             method.dist=method.dist,
@@ -183,7 +196,7 @@ clusterMI<-function(output,
   res.ana <- cluster.intern(res.imp = res.imp.intern,
                             method.clustering = method.clustering,
                             scaling = scaling.intern,
-                            nb.clust = nb.clust.intern,
+                            nb.clust = nb.clust.ana,
                             method.hclust = method.hclust,
                             method.dist = method.dist,
                             modelNames = modelNames,
@@ -208,15 +221,15 @@ clusterMI<-function(output,
   #partition
   
   if(method.consensus=="CSPA"){
-    Dimnames<-list(seq(nrow(res.clust.part)), "R1", paste0("m=",seq(length(res.clust.part.list))), nb.clust.intern)
+    Dimnames<-list(seq(nrow(res.clust.part)), "R1", paste0("m=",seq(length(res.clust.part.list))), nb.clust.nmf)
     
     res.pool<-array(NA,dim=sapply(Dimnames,length),dimnames = Dimnames)
     res.pool[,1,,1]<-res.clust.part
-    res.pool<-CSPA(res.pool,k=nb.clust.intern)
+    res.pool<-CSPA(res.pool,k=nb.clust.nmf)
   }else if(method.consensus=="NMF"){
-    # print(k);print(summary(res.clust.part))
+
     res.pool<-fastnmf(listpart = res.clust.part.list,
-                      nb.clust=nb.clust.intern,
+                      nb.clust=nb.clust.nmf,
                       method.init = parameter.nmf$method.init,
                       threshold = parameter.nmf$threshold,
                       printflag = parameter.nmf$printflag,
@@ -242,13 +255,13 @@ clusterMI<-function(output,
       
       # clusterEvalQ(cl, library("micemd"))
       
-      parallel::clusterExport(cl, list("res.imp.intern","calculintra.intern","method.clustering","Cboot","nb.clust.intern","scaling.intern","method.hclust","method.dist","MCA", "FAMD",
+      parallel::clusterExport(cl, list("res.imp.intern","calculintra.intern","method.clustering","Cboot","nb.clust.ana","scaling.intern","method.hclust","method.dist","MCA", "FAMD",
                                        "cmeansCBI.intern","kmeansCBI", "nselectboot", "claraCBI", "noisemclustCBI", "hclustCBI","nstart.kmeans","modelNames","m.cmeans"), envir = environment())
       U<-parallel::parSapply(cl,res.imp.intern,
                              FUN=calculintra.intern,
                              method.clustering=method.clustering,
                              Cboot=Cboot,
-                             nb.clust=nb.clust.intern,
+                             nb.clust=nb.clust.ana,
                              scaling=scaling.intern,
                              method.agnes=method.hclust,
                              method.dist=method.dist,
@@ -261,7 +274,7 @@ clusterMI<-function(output,
       U<-sapply(res.imp.intern,
                 FUN=calculintra.intern,
                 method.clustering=method.clustering,
-                Cboot=Cboot,nb.clust=nb.clust.intern,
+                Cboot=Cboot,nb.clust=nb.clust.ana,
                 scaling=scaling.intern,
                 method.agnes=method.hclust,
                 method.dist = method.dist,
@@ -291,7 +304,7 @@ clusterMI<-function(output,
                             method.consensus=method.consensus,
                             method.clustering=method.clustering,
                             scaling=scaling,
-                            nb.clust=nb.clust.intern,
+                            nb.clust=c("ana"=nb.clust.ana,"nmf"=nb.clust.nmf),
                             Cboot=Cboot,
                             method.hclust=method.hclust,
                             method.dist= method.dist,
@@ -304,14 +317,14 @@ clusterMI<-function(output,
                             m.cmeans=m.cmeans,
                             parameter.nmf=parameter.nmf,
                             res.analyse = res.clust.part.list))
-  }else{
+  }else if(!instability){
     res.out<-list(part=res.pool,
                   instability=list(Ubar=NA,U=NA,B=NA),
                   call=list(output=output,
                             method.consensus=method.consensus,
                             method.clustering=method.clustering,
                             scaling=scaling,
-                            nb.clust=nb.clust,
+                            nb.clust=c("ana"=nb.clust.ana,"nmf"=nb.clust.nmf),
                             Cboot=Cboot,
                             method.hclust=method.hclust,
                             method.dist= method.dist,
