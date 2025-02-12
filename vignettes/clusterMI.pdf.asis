@@ -1,0 +1,9 @@
+%\VignetteIndexEntry{clusterMI: Cluster Analysis with Missing Values by Multiple Imputation}
+%\VignetteEngine{R.rsp::asis}
+%\VignetteEncoding{UTF-8}
+
+%\VignetteKeyword{clusterMI}
+%\VignetteKeyword{missing data}
+%\VignetteKeyword{vignette}
+%\VignetteKeyword{clustering}
+%\VignetteKeyword{package}

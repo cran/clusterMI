@@ -2,8 +2,8 @@ Encoding: UTF-8
 Package: clusterMI
 Type: Package
 Title: Cluster Analysis with Missing Values by Multiple Imputation
-Version: 1.3
-Date: 2024-12-12
+Version: 1.4.0
+Date: 2025-02-12
 Authors@R: c(
   person("Vincent","Audigier",email="vincent.audigier@cnam.fr",role=c("aut","cre"),comment="CNAM MSDMA team"),
   person("Hang Joon","Kim",email="hang.kim@uc.edu",role=c("ctb"),comment="University of Cincinnati"))
@@ -17,15 +17,15 @@ Imports: stats, graphics, parallel, mice, micemd, mclust, mix, fpc,
         reshape2, methods, Rcpp
 RoxygenNote: 7.3.2
 Suggests: knitr, rmarkdown, stargazer, VIM, missMDA, clustrd,
-        clusterCrit, bookdown
-VignetteBuilder: knitr
+        clusterCrit, bookdown, R.rsp
+VignetteBuilder: R.rsp
 LazyData: true
 LinkingTo: Rcpp, RcppArmadillo
 RcppModules: IO_module
 NeedsCompilation: yes
-Packaged: 2024-12-12 14:32:18 UTC; vince
+Packaged: 2025-02-12 10:37:24 UTC; vince
 Author: Vincent Audigier [aut, cre] (CNAM MSDMA team),
   Hang Joon Kim [ctb] (University of Cincinnati)
 Maintainer: Vincent Audigier <vincent.audigier@cnam.fr>
 Repository: CRAN
-Date/Publication: 2024-12-12 16:00:02 UTC
+Date/Publication: 2025-02-12 11:40:10 UTC

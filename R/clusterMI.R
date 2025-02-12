@@ -249,7 +249,8 @@ clusterMI<-function(output,
     #variance
     # if(length(res.imp)>1){
     if(nnodes>1){
-      cl <- parallel::makeCluster(nnodes, type = "PSOCK")
+      type.OS <-ifelse(.Platform$OS.type=="unix","FORK","PSOCK")
+      cl <- parallel::makeCluster(nnodes, type = type.OS)
       # parallel::clusterEvalQ(cl, library("fpc"))
       # parallel::clusterEvalQ(cl, library("FactoMineR"))
       

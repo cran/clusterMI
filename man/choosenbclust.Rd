@@ -29,6 +29,7 @@ a list of two objects
 The \code{choosenbclust} function browses a grid of values for the number of clusters and for each one imputes the data and computes the instability.
 }
 \examples{
+\dontshow{if (.Platform$OS.type=="windows") (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 data(wine, package = "clusterMI")
 
 require(parallel)
@@ -51,6 +52,7 @@ res.pool <- clusterMI(res.imp, nnodes = nnodes, instability = FALSE)
 choosenbclust(res.pool)
 
 }
+\dontshow{\}) # examplesIf}
 }
 \references{
 Audigier, V. and Niang, N., Clustering with missing data: which equivalent for Rubin's rules? Advances in Data Analysis and Classification <doi:10.1007/s11634-022-00519-1>, 2022.

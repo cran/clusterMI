@@ -48,6 +48,7 @@ From a list of partitions \code{fastnmf} pools partition as proposed in Li and D
 fastnmf performs consensus clustering using non-negative matrix factorization following Li and Ding (2007) <doi:10.1109/ICDM.2007.98>. The set of partitions that are aggregated needs to be given as a list where each element is a vector of numeric values. Note that the number of classes for each partition can vary. The number of classes for the consensus partition should be given using the \code{nb.clust} argument. The NMF algorithm is iterative and required an initial partition. This latter is specified by \code{method.init}. \code{method.init = "BOK"} means the partition considered is a partition from \code{listpart} which minimizes the NMF criterion. Alternative methods are "kmeans", "minibathckmeans" or "sample". If \code{method.init} = "kmeans" (or "minibatchkmeans"), then clustering on the average of connectivity matrices is performed by kmeans (or "minibatchkmeans"). Mini Batch Kmeans could be faster than kmeans if the number of individuals is large. If \code{method.init} = "sample", then a random partition is drawn. If \code{method.init} is a vector of several characters, then several initialization methods are considered and the best method is returned. By default, \code{method.init = c("BOK", "kmeans")}.
 }
 \examples{
+\dontshow{if (.Platform$OS.type=="windows") (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 data(wine, package = "clusterMI")
 require(clustrd)
 set.seed(123456)
@@ -76,7 +77,7 @@ res.ana.rkm <-lapply(res.ana.rkm,"[[","cluster")
 res.pool.rkm <- fastnmf(res.ana.rkm, nb.clust = nb.clust)
 ## extract the partition corresponding to the best initialisation
 part <- res.pool.rkm$best$clust
-
+\dontshow{\}) # examplesIf}
 }
 \references{
 T. Li, C. Ding, and M. I. Jordan (2007) Solving consensus and semi-supervised clustering problems using nonnegative matrix factorization.  In Proceedings of the 2007 Seventh IEEE International Conference on Data Mining, ICDM'07, page 577-582, USA. IEEE Computer Society. <doi:10.1109/ICDM.2007.98>

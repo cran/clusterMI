@@ -86,7 +86,8 @@
   #chaque ?l?ments de lise varblock est un sous ensemble de variables avec un minimum de chevauchements
   # print(names(listvarblock))
   
-  cl <- parallel::makeCluster(nnodes, type = "PSOCK")
+  type.OS <-ifelse(.Platform$OS.type=="unix","FORK","PSOCK")
+  cl <- parallel::makeCluster(nnodes, type = type.OS)
   parallel::clusterExport(cl, list("algo.intern","imputation.intern","lm","step",
   "X.intern","Y","methods","listvarblock", "path.outfile","printflag", "knockoff.arg", "glmnet.arg","stepwise.arg","seed","nb.clust",
   "create.fixed", "stat.glmnet_coefdiff", "knockoff.filter","with_seed", "rngseed", "prelim.mix", "imp.mix", "em.mix", "cv.glmnet","modelNames"

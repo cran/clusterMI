@@ -22,7 +22,7 @@
 #' @importFrom Rfast Crossprod Tcrossprod mat.mult
 #' @importFrom stats kmeans
 #' @export
-#' @examples
+#' @examplesIf .Platform$OS.type=="windows"
 #' data(wine, package = "clusterMI")
 #' require(clustrd)
 #' set.seed(123456)
@@ -98,7 +98,7 @@ fastnmf<-function(listpart,
     return(res)
   }
   
-  if((!("MiniBatchKmeans"%in%method.init))&("kmeans"%in%method.init)&(length(listpart.intern[[1]])>=1000)){warning("The numbers of individuals is large. You should specify the batch_size argument to accelerate the initialisation step.")}
+  if((!("minibatchkmeans"%in%method.init))&("kmeans"%in%method.init)&(length(listpart.intern[[1]])>=1000)){warning("The numbers of individuals is large. You should specify the batch_size argument to accelerate the initialisation step.")}
   Mtilde<-matrix(0,length(listpart.intern[[1]]),length(listpart.intern[[1]]))#matrice d'adjacence rempli de 0
   for(ii in seq(length(listpart.intern))){
     Mtilde<-Mtilde+tcrossprod(class2ind(factor(listpart.intern[[ii]])))#somme de toutes les matrices d'adjacences
@@ -107,7 +107,7 @@ fastnmf<-function(listpart,
   
   #initialisation
   res.kmeans <- sapply(method.init,
-                       initfastnmf,
+                       initfastnmf.intern,
                        Mtilde = Mtilde,
                        nb.clust = nb.clust,
                        listpart = listpart,

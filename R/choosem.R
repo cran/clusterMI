@@ -22,7 +22,7 @@
 #' @seealso \code{\link{clusterMI}}, \code{\link{imputedata}}
 #' @references
 #'  Audigier, V. and Niang, N., Clustering with missing data: which equivalent for Rubin's rules? Advances in Data Analysis and Classification <doi:10.1007/s11634-022-00519-1>, 2022.
-#' @examples
+#' @examplesIf .Platform$OS.type=="windows"
 #' data(wine, package = "clusterMI")
 #' 
 #' set.seed(123456)
@@ -49,7 +49,8 @@ choosem <- function(output,graph=TRUE,nnodes = 1){
     nnodes.intern <- nnodes
   }
   if(nnodes.intern>1){
-    cl <- parallel::makeCluster(nnodes.intern, type = "PSOCK")
+    type.OS <-ifelse(.Platform$OS.type=="unix","FORK","PSOCK")
+    cl <- parallel::makeCluster(nnodes.intern, type = type.OS)
     parallel::clusterExport(cl, list("output","fastnmf"), envir = environment())
     part <- parallel::parSapply(cl, seq(1,output$call$output$call$m,1),
                                 FUN = function(m,output){

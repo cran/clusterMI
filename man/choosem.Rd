@@ -33,6 +33,7 @@ then it means last imputed dataset does not modify the consensus partition.
 Consequently, the number of imputed datasets can be considered as sufficiently large.
 }
 \examples{
+\dontshow{if (.Platform$OS.type=="windows") (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 data(wine, package = "clusterMI")
 
 set.seed(123456)
@@ -51,6 +52,7 @@ nnodes <- 2 # number of CPU cores for parallel computing
 res.pool <- clusterMI(res.imp, instability = FALSE, nnodes = nnodes)
 
 res.choosem <- choosem(res.pool)
+\dontshow{\}) # examplesIf}
 }
 \references{
 Audigier, V. and Niang, N., Clustering with missing data: which equivalent for Rubin's rules? Advances in Data Analysis and Classification <doi:10.1007/s11634-022-00519-1>, 2022.

@@ -134,13 +134,12 @@ cluster.intern<-function(res.imp,
                                   if(nb.clust>0){
                                     part <- cutree(res.hclust,k=nb.clust)
                                   }else if (nb.clust <0){
-                                    kgrid<-seq.int(from = 2,to = nrow(xx)/10)
+                                    kgrid<-seq.int(from = 2,to = min(nrow(xx)/10,15))
                                     names(kgrid)<-kgrid
                                     Sil <- sapply(kgrid,FUN = function(k,d){
                                       Silhouette.intern(d = d,cl = cutree(res.hclust,k=k))
                                     },d=d)
                                     names(Sil)<-kgrid
-                                    print(Sil)
                                     kopt <- as.numeric(names(which.max(Sil)))
                                     part <- cutree(res.hclust,k=kopt)
                                   }

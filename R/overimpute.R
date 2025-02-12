@@ -93,7 +93,8 @@ overimpute <- function (res.imputedata, plotvars = NULL, plotinds = NULL, nnodes
 
   don.plot <- as.matrix(res.imputedata$call$data.na[Ind, Var[is.plot], drop = FALSE])
   res.over <- matrix(NA, nrow = sum(!is.na(don.plot)), ncol = m.intern)
-  cl <- parallel::makeCluster(nnodes, type = "PSOCK")
+  type.OS <-ifelse(.Platform$OS.type=="unix","FORK","PSOCK")
+  cl <- parallel::makeCluster(nnodes, type = type.OS)
   parallel::clusterExport(cl, list("is.plot", "res.imputedata", 
                          "path.outfile", "Ind","imputedata","myem.mix","em.mix", "myimp.mix","imp.mix", "da.mix", "prelim.mix", "rngseed", "Mclust",
                          "mice", "complete",

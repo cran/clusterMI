@@ -10,7 +10,7 @@
 #' @importFrom stats kmeans
 #' @keywords internal
 #' 
-initfastnmf <- function(method,Mtilde,listpart=NULL,nb.clust=NULL,
+initfastnmf.intern <- function(method,Mtilde,listpart=NULL,nb.clust=NULL,
                         parameter.kmeans=list(nstart=100,
                                               iter.max=50,
                                               algorithm = c("Hartigan-Wong", "Lloyd", "Forgy",
@@ -48,12 +48,12 @@ initfastnmf <- function(method,Mtilde,listpart=NULL,nb.clust=NULL,
     }else{
       res.out <- NULL
     }
-  }else if(method=="MiniBatchKmeans"){
+  }else if(method=="minibatchkmeans"){
     res.kmeans<-try(MiniBatchKmeans(Mtilde,
                                     clusters = nb.clust,
                                     batch_size = parameter.minibatchkmeans$batch_size,
-                                    num_init = parameter.minibatchkmeans$nstart,
-                                    max_iters = parameter.minibatchkmeans$iter.max,
+                                    num_init = parameter.minibatchkmeans$num_init,
+                                    max_iters = parameter.minibatchkmeans$max_iters,
                                     init_fraction = parameter.minibatchkmeans$init_fraction,
                                     initializer = parameter.minibatchkmeans$initializer,
                                     early_stop_iter = parameter.minibatchkmeans$early_stop_iter,
