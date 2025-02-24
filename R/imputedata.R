@@ -512,16 +512,14 @@ imputedata<-function(data.na,
             newtheta <- try(da.mix(res.myem$s, newtheta, steps = L), silent = TRUE)
             cond1 <- cond2 <- inherits(newtheta, "try-error")
             if (!cond1) {
-              cond2 <- any(unlist(lapply(newtheta, is.nan),
-                                  any))
+              cond2 <- any(unlist(lapply(newtheta, is.nan)))
             }
             if (cond1 | cond2) {
               warning(
                 paste0("Imputation using JM-GL fails to impute ", m," datasets. Try to change the seed argument or use another imputation method (e.g. FCS-homo)"))
               (break)()
             }
-          }else if(any(unlist(lapply(res.try, is.nan),
-                              any))){
+          }else if(any(unlist(lapply(res.try, is.nan)))){
             warning(
               paste0("Imputation using JM-GL fails to impute ", m," datasets. Try to change the seed argument or use another imputation method (e.g. FCS-homo)"))
             (break)()

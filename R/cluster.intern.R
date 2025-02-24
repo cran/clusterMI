@@ -37,7 +37,7 @@
 #' @importFrom fpc kmeansCBI nselectboot claraCBI noisemclustCBI hclustCBI
 #' @importFrom utils setTxtProgressBar txtProgressBar
 #' @examples
-#' data(wine)
+#' data(wine, package = "clusterMI")
 #' 
 #' require(parallel)
 #' set.seed(123456)

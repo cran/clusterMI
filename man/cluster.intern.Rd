@@ -67,7 +67,7 @@ If \code{method.clustering = "cmeans"} (clustering using the fuzzy c-means algor
 Can be performed in parallel by specifying the number of CPU cores (\code{nnodes} argument).
 }
 \examples{
-data(wine)
+data(wine, package = "clusterMI")
 
 require(parallel)
 set.seed(123456)

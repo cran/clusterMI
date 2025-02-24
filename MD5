@@ -1,4 +1,4 @@
-c8f90e5779edbee8b71596110fbcb0c8 *DESCRIPTION
+ee2d733ee728cd17bf5960c449dc3205 *DESCRIPTION
 9260e480dac75ee061583cfd863e32c7 *NAMESPACE
 be75dc5efa64480b73531351ed0e2739 *R/2_Function_createModel_Run_new.R
 a39d388e77a3512be588e2ff95cb91a2 *R/LoadModule.R
@@ -14,14 +14,14 @@ b696c5e53ec57281ae4d752d7fdb0428 *R/choosenbclust.R
 413c9ada37481e6f68ced0d38c59ca53 *R/chooser.R
 687d42d54a7ae9d01ad65d66518d6e41 *R/class2ind.R
 cf00ef54d169478d8bf200cf6fec6e76 *R/close.txtProgressBar.R
-6f49353772c32cd6219475a74a1156ab *R/cluster.intern.R
+cd0151600c7ceeaf4295b1fc5b1101aa *R/cluster.intern.R
 6b62f4c5c6a174ee344c48e71c4351a4 *R/clusterMI-package.R
 b8639c5c9e3fb9dcaff2039df3a3f825 *R/clusterMI.R
 5ffacc68dbc60dac2c189ba0cd5d228e *R/cmeansCBI.intern.R
 266cd16b5f0bf4223f18dd3a962a6901 *R/drawW.R
 3cbe2a7316873cc178a2c53c6b48591e *R/fastnmf.R
 4f41e2190738e4b56f60eb77a0ab6bfb *R/imputation.intern.R
-82391ac6586210a8ad994c6fe6a185ee *R/imputedata.R
+4b2adc6b1844d851399afa2f51629e5e *R/imputedata.R
 257cff979dd760f775731d0fc13ecb0f *R/initfastnmf.intern.R
 272a717ed79238a918d78007cf8dab3d *R/mclustboot.intern.R
 9aff5bd468ea0480c2011cb71a761b55 *R/myem.cat.R
@@ -37,10 +37,10 @@ a74e32250219bbe5829ef6350b3cf991 *R/readData.R
 a6f79633d975727fa0531a97c4a5bfe5 *R/varselbest.R
 094fbb9fcc2a44ace0e8363a8afdd7db *R/varselbest.intern.R
 8d090f7c058bed264b04c8e97d19b969 *R/wine.R
-d9599319614f5a372c9e9694897f075c *build/vignette.rds
+49edd3eca4700b4c899a8905a3be4484 *build/vignette.rds
 bcfa374e469c87df9fc5f043a64be471 *data/wine.rda
 9f9abf2ba80f8d1a50e4998dc2a2556e *inst/CITATION
-08c49ab48c016aa0e56aa25c40c7070f *inst/doc/clusterMI.pdf
+f2e8b691adaa1ece1c9b55064fcc58f1 *inst/doc/clusterMI.pdf
 704811d27a8cb9ec8c28f8aeef76cda9 *inst/doc/clusterMI.pdf.asis
 9adbf78d24742ad6b961e42de7f7d8cf *man/Rcpp_modelobject-class.Rd
 b7aeeb3f4474bf58e228a570613a249e *man/Silhouette.intern.Rd
@@ -50,7 +50,7 @@ e2acf73647a3011837c7ccab5f377013 *man/chooseB.Rd
 f85a93a3c64690a61b6e1deb11cff9ae *man/choosemaxit.Rd
 9bddab49d9fa30829eee449c9c501ecf *man/choosenbclust.Rd
 82dd63a44c911f6751bd7678dafcab0e *man/chooser.Rd
-cfe54a3f50fc93cc8fa85bbde803b646 *man/cluster.intern.Rd
+370342a18b521a742c85971f27e0b3f9 *man/cluster.intern.Rd
 df227225cba7ce3f7dcc24815f10beb4 *man/clusterMI-package.Rd
 f7bd05184d33e824b7a88955606f0a1e *man/clusterMI.Rd
 4f7182fc77a1329223ec4a091f78f9e8 *man/fastnmf.Rd
